@@ -1,0 +1,188 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+  --bg: #F8F4EF;
+  --surface: #F2E9DE;
+  --sidebar-bg: #2C211F;
+  --primary-blue: #336780;
+  --secondary-rust: #A9533C;
+  --success-olive: #58613A;
+  --muted: #3C302B;
+  --card-shadow: 0 10px 30px rgba(60, 48, 43, 0.08);
+  --radius: 18px;
+  color-scheme: light;
+  font-family: 'Roboto', 'Arial', sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: #172026;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { 
+  box-sizing: border-box; 
+}
+
+/* Material card defaults */
+mat-card {
+  border-radius: var(--radius) !important;
+  background: var(--surface);
+  box-shadow: var(--card-shadow) !important;
+  padding: 1rem;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* Page layout helpers */
+.page { display: flex; flex-direction: column; gap: 1.5rem; }
+.page-header { display: flex; justify-content: space-between; align-items: center; }
+.form-card, .result-card { max-width: 900px; }
+.full-width { width: 100%; }
+
+/* Buttons */
+.mat-raised-button { border-radius: 8px; padding: 0.6rem 1rem; }
+
+/* Links and small text */
+a { text-decoration: none; color: inherit; }
+
+/* Small utilities for consistent spacing */
+.muted { color: var(--muted); }
+
+/* General content container used by main layout */
+.app-content { padding: 1.5rem; max-width: 1200px; margin: 0 auto; }
+
+/* Subtle parchment / floor-plan like background using gradients */
+body {
+  background-color: var(--bg);
+  background-image: linear-gradient(180deg, rgba(248,244,239,0.98), rgba(248,244,239,0.98)),
+    radial-gradient(circle at 70% 10%, rgba(60,48,43,0.08), transparent 8%),
+    repeating-linear-gradient(-35deg, rgba(60,48,43,0.02) 0 1px, transparent 1px 80px);
+  background-blend-mode: normal, overlay, normal;
+}
+
+/* App shell rounded container */
+.app-shell { border-radius: 12px; overflow: hidden; margin: 8px; box-shadow: 0 14px 50px rgba(16,24,32,0.10); }
+
+/* Sidebar textured look */
+.sidebar { width: 220px; padding-top: 14px; padding-bottom: 14px; background: var(--sidebar-bg); color: #fff; box-shadow: inset -1px 0 0 rgba(255,255,255,0.03); }
+
+/* Compact sidebar brand area */
+.sidebar .brand { display: flex; align-items: center; gap: 10px; padding: 14px 18px; font-size: 1.05rem; font-weight: 700; }
+.sidebar .brand .logo { height: 28px; width: 28px; display: inline-block; border-radius: 6px; background: rgba(255,255,255,0.12); text-align: center; line-height: 28px; }
+
+/* ==========================================================
+   NAVEGACIÓN SIDEBAR (Optimizado para Angular Material MDC)
+   ========================================================== */
+
+/* Reseteo de las variables internas de Material */
+.sidebar .mat-mdc-list-item {
+  --mdc-list-item-container-color: transparent !important;
+  --mdc-list-item-hover-container-color: transparent !important;
+  --mdc-list-item-focus-container-color: transparent !important;
+  --mdc-list-item-selected-container-color: transparent !important;
+  --mdc-list-item-activated-container-color: transparent !important;
+  
+  border-radius: 10px !important;
+  margin: 6px 0 !important;
+  border: 1px solid transparent !important;
+  transition: all 0.2s ease !important;
+  background-color: transparent !important;
+}
+
+/* Desactivar overlays oscuros o de ripple nativos */
+.sidebar .mat-mdc-list-item .mdc-list-item__ripple,
+.sidebar .mat-mdc-list-item .mat-mdc-focus-indicator,
+.sidebar .mat-mdc-list-item::before,
+.sidebar .mat-mdc-list-item::after {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* Color e iconos base del menú */
+.sidebar .mat-mdc-list-item .mdc-list-item__primary-text {
+  color: #C5BBB7 !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+}
+
+.sidebar .mat-mdc-list-item mat-icon {
+  color: #C5BBB7 !important;
+  margin-right: 12px !important;
+}
+
+/* Hover */
+.sidebar .mat-mdc-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.sidebar .mat-mdc-list-item:hover .mdc-list-item__primary-text,
+.sidebar .mat-mdc-list-item:hover mat-icon {
+  color: #ffffff !important;
+}
+
+/* Item Activo (Borde fino y fondo sutil) */
+.sidebar .mat-mdc-list-item.active {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid #6B5B53 !important;
+  box-shadow: none !important;
+}
+
+.sidebar .mat-mdc-list-item.active .mdc-list-item__primary-text,
+.sidebar .mat-mdc-list-item.active mat-icon {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* ========================================================== */
+
+/* Topbar thin and rounded */
+.topbar { height: 56px; line-height: 56px; border-top-left-radius: 12px; border-top-right-radius: 12px; background: #3C302B; padding-left: 1.5rem; color: #fff; }
+.topbar span { font-weight: 600; font-family: 'Roboto', sans-serif; letter-spacing: 0.01em; }
+
+/* Accent top borders for stat cards */
+.stat-card { position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; height: 14px; width: 100%; }
+.stat-card.accent-1::before { background: linear-gradient(90deg, #2fd2df, #63baf2); }
+.stat-card.accent-2::before { background: linear-gradient(90deg, #f6a85b, #b65a30); }
+.stat-card.accent-3::before { background: linear-gradient(90deg, #d9d9d9, #b8b8b8); }
+.stat-card.accent-4::before { background: linear-gradient(90deg, #4f8a5b, #b9d79e); }
+.stat-card.accent-5::before { background: linear-gradient(90deg, #d1669c, #8d5baf); }
+
+/* Card inner styling: light background, subtle border */
+.stat-card mat-card { background: linear-gradient(180deg, rgba(255,255,255,0.996), rgba(250,249,246,0.996)); border: 1px solid rgba(16,24,32,0.04); padding: 1.25rem; border-radius: 16px; min-height: 160px; display: flex; flex-direction: column; justify-content: center; }
+
+/* Large number style inside stat cards (pixel-tuned) */
+.stat-card .stat-number { font-family: 'Inter', 'Roboto', sans-serif; font-size: 36px; font-weight: 800; color: #111827; margin-top: 8px; letter-spacing: -0.6px; }
+.stat-card mat-card-title, .stat-card .stat-title { font-size: 0.95rem; color: #8b8f94; font-weight: 600; }
+
+/* Emulate pill accent shadow and small offset like mockup */
+.stat-card.accent-1::before { background: linear-gradient(90deg, #2a4d3a, #5a8a6b); transform: translateY(2px); }
+.stat-card.accent-2::before { background: linear-gradient(90deg, #b08900, #d4a800); transform: translateY(2px); }
+.stat-card.accent-3::before { background: linear-gradient(90deg, #8b5e3c, #b07a52); transform: translateY(2px); }
+.stat-card.accent-4::before { background: linear-gradient(90deg, #4a7a6b, #6fb39c); transform: translateY(2px); }
+.stat-card.accent-5::before { background: linear-gradient(90deg, #9c4a57, #c06a73); transform: translateY(2px); }
+
+/* Hover elevation for cards */
+.stat-card mat-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(16,24,32,0.12); }
+
+/* Buttons in actions */
+.actions .mat-raised-button { border-radius: 16px; padding: 0.75rem 1.25rem; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.14); transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; font-weight: 600; }
+.actions .mat-raised-button:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16); }
+.actions .mat-raised-button.btn-primary { background: #336780 !important; color: #fff; box-shadow: 0 14px 40px rgba(51,103,128,0.26); }
+.actions .mat-raised-button.btn-secondary { background: #A9533C !important; color: #fff; box-shadow: 0 14px 40px rgba(169,83,60,0.28); }
+.actions .mat-raised-button.btn-tertiary { background: #58613A !important; color: #fff; box-shadow: 0 14px 40px rgba(88,97,58,0.28); }
+
+/* Floorplan watermark on right side of the content */
+.app-content { position: relative; }
+.app-content::after {
+  content: '';
+  position: absolute;
+  right: 30px; top: 10px;
+  width: 580px; height: 480px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700"><g fill="none" stroke="%23624b3f" stroke-width="2" opacity="0.12"><rect x="30" y="30" width="840" height="640" rx="12"/><path d="M170 250h240v140H170zM430 130h240v110H430zM690 260h140v160H690zM210 450h140v100H210zM520 460h160v90H520z"/></g></svg>');
+  background-repeat: no-repeat; background-size: contain; pointer-events: none; opacity: 0.16;
+}
