@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page-header">
+    <h2>Mesas</h2>
+    <div class="search-actions">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar mesa</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Número, capacidad, estado, ocupada"
+          [value]="searchQuery"
+          (input)="onSearch($any($event.target).value)"
+        />
+        <button mat-icon-button matSuffix *ngIf="searchQuery" aria-label="Limpiar búsqueda" (click)="onSearch('')">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="resetForm()">Nueva mesa</button>
+    </div>
+  </div>
+
+  <form [formGroup]="tableForm" (ngSubmit)="saveTable()" class="form-card">
+    <mat-card>
+      <mat-card-title>{{ editingId ? 'Editar mesa' : 'Crear mesa' }}</mat-card-title>
+      <mat-card-content>
+        <div class="form-grid">
+          <mat-form-field>
+            <mat-label>Número</mat-label>
+            <input matInput formControlName="number" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Capacidad</mat-label>
+            <input matInput type="number" formControlName="capacity" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="Disponible">Disponible</mat-option>
+              <mat-option value="Reservada">Reservada</mat-option>
+              <mat-option value="Ocupada">Ocupada</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Disponibilidad</mat-label>
+            <mat-select formControlName="isOccupied">
+              <mat-option [value]="true">Ocupada</mat-option>
+              <mat-option [value]="false">Disponible</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" type="submit" [disabled]="tableForm.invalid">Guardar</button>
+        <button mat-button type="button" (click)="resetForm()">Cancelar</button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+
+  <div class="cards-grid">
+    <mat-card *ngFor="let table of filteredTables" class="table-card">
+      <mat-card-title>Mesa {{ table.number }}</mat-card-title>
+      <mat-card-content>
+        <p><strong>Capacidad:</strong> {{ table.capacity }}</p>
+        <p><strong>Estado:</strong> {{ table.status }}</p>
+        <p><strong>Disponibilidad:</strong> {{ table.isOccupied ? 'Ocupada' : 'Disponible' }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-icon-button color="primary" (click)="editTable(table)"><mat-icon>edit</mat-icon></button>
+        <button mat-icon-button color="warn" (click)="deleteTable(table.id)"><mat-icon>delete</mat-icon></button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <div class="empty-state" *ngIf="filteredTables.length === 0">
+    No se encontraron mesas que coincidan con "{{ searchQuery }}".
+  </div>
+</div>

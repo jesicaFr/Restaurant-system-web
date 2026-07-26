@@ -1,0 +1,40 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <span class="dashboard-count">{{ totalTables }}</span>
+  </div>
+
+  <div class="cards">
+    <mat-card class="stat-card accent-1">
+      <div class="card-top"></div>
+      <mat-card-title class="stat-title">Total de mesas</mat-card-title>
+      <mat-card-content><div class="stat-number">{{ totalTables }}</div></mat-card-content>
+    </mat-card>
+    <mat-card class="stat-card accent-2">
+      <div class="card-top"></div>
+      <mat-card-title class="stat-title">Mesas ocupadas</mat-card-title>
+      <mat-card-content><div class="stat-number">{{ occupiedTables }}</div></mat-card-content>
+    </mat-card>
+    <mat-card class="stat-card accent-3">
+      <div class="card-top"></div>
+      <mat-card-title class="stat-title">Mesas disponibles</mat-card-title>
+      <mat-card-content><div class="stat-number">{{ availableTables }}</div></mat-card-content>
+    </mat-card>
+    <mat-card class="stat-card accent-4">
+      <div class="card-top"></div>
+      <mat-card-title class="stat-title">Ventas del día</mat-card-title>
+      <mat-card-content><div class="stat-number">{{ dailySales?.totalSales | currency:'USD':'symbol':'1.0-0' }}</div></mat-card-content>
+    </mat-card>
+    <mat-card class="stat-card accent-5">
+      <div class="card-top"></div>
+      <mat-card-title class="stat-title">Pedidos activos</mat-card-title>
+      <mat-card-content><div class="stat-number">{{ activeOrders }}</div></mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="actions">
+    <a mat-raised-button color="primary" routerLink="/tables" class="btn-primary">Gestionar mesas</a>
+    <a mat-raised-button color="accent" routerLink="/menu-items" class="btn-secondary">Gestionar menú</a>
+    <a mat-raised-button color="warn" routerLink="/orders" class="btn-tertiary">Gestionar pedidos</a>
+  </div>
+</div>

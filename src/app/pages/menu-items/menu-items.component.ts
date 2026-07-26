@@ -15,83 +15,8 @@ import { CreateMenuItemRequest, MenuItem } from '../../core/models/menu-item.mod
   selector: 'app-menu-items',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatTableModule],
-  template: `
-    <div class="page">
-      <div class="page-header">
-        <h2>Menú</h2>
-        <button mat-raised-button color="primary" (click)="resetForm()">Nuevo producto</button>
-      </div>
-
-      <form [formGroup]="itemForm" (ngSubmit)="saveItem()" class="form-card">
-        <mat-card>
-          <mat-card-title>{{ editingId ? 'Editar producto' : 'Crear producto' }}</mat-card-title>
-          <mat-card-content>
-            <div class="form-grid">
-              <mat-form-field>
-                <mat-label>Nombre</mat-label>
-                <input matInput formControlName="name" />
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Precio</mat-label>
-                <input matInput type="number" formControlName="price" />
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Descripción</mat-label>
-                <textarea matInput formControlName="description"></textarea>
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Disponibilidad</mat-label>
-                <mat-select formControlName="isAvailable">
-                  <mat-option [value]="true">Disponible</mat-option>
-                  <mat-option [value]="false">No disponible</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </mat-card-content>
-          <mat-card-actions>
-            <button mat-raised-button color="primary" type="submit" [disabled]="itemForm.invalid">Guardar</button>
-            <button mat-button type="button" (click)="resetForm()">Cancelar</button>
-          </mat-card-actions>
-        </mat-card>
-      </form>
-
-      <table mat-table [dataSource]="items" class="mat-elevation-z2 full-width">
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Nombre</th>
-          <td mat-cell *matCellDef="let item">{{ item.name }}</td>
-        </ng-container>
-        <ng-container matColumnDef="description">
-          <th mat-header-cell *matHeaderCellDef>Descripción</th>
-          <td mat-cell *matCellDef="let item">{{ item.description }}</td>
-        </ng-container>
-        <ng-container matColumnDef="price">
-          <th mat-header-cell *matHeaderCellDef>Precio</th>
-          <td mat-cell *matCellDef="let item">{{ item.price | currency }}</td>
-        </ng-container>
-        <ng-container matColumnDef="isAvailable">
-          <th mat-header-cell *matHeaderCellDef>Estado</th>
-          <td mat-cell *matCellDef="let item">{{ item.isAvailable ? 'Disponible' : 'No disponible' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Acciones</th>
-          <td mat-cell *matCellDef="let item">
-            <button mat-icon-button color="primary" (click)="editItem(item)"><mat-icon>edit</mat-icon></button>
-            <button mat-icon-button color="warn" (click)="deleteItem(item.id)"><mat-icon>delete</mat-icon></button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    </div>
-  `,
-  styles: [
-    `.page { display: flex; flex-direction: column; gap: 1.5rem; }`,
-    `.page-header { display: flex; justify-content: space-between; align-items: center; }`,
-    `.form-card { max-width: 900px; }`,
-    `.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }`,
-    `.full-width { width: 100%; }`
-  ]
+  templateUrl: './menu-items.component.html',
+  styleUrls: ['./menu-items.component.css']
 })
 export class MenuItemsComponent implements OnInit {
   items: MenuItem[] = [];

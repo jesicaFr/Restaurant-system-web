@@ -1,0 +1,44 @@
+<mat-sidenav-container class="app-shell">
+  <mat-sidenav #snav [mode]="isSmall ? 'over' : 'side'" [opened]="!isSmall" class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">🍴</span>
+      <span>Restaurante</span>
+    </div>
+    
+    <mat-nav-list>
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a mat-list-item routerLink="/tables" routerLinkActive="active">
+        <mat-icon>table_restaurant</mat-icon>
+        <span>Mesas</span>
+      </a>
+      <a mat-list-item routerLink="/menu-items" routerLinkActive="active">
+        <mat-icon>restaurant_menu</mat-icon>
+        <span>Menú</span>
+      </a>
+      <a mat-list-item routerLink="/orders" routerLinkActive="active">
+        <mat-icon>receipt_long</mat-icon>
+        <span>Pedidos</span>
+      </a>
+      <a mat-list-item routerLink="/cash-register" routerLinkActive="active">
+        <mat-icon>attach_money</mat-icon>
+        <span>Caja</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content-container">
+    <mat-toolbar class="topbar">
+      <button mat-icon-button (click)="snav.toggle()" *ngIf="isSmall">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>Sistema de gestión de restaurante</span>
+    </mat-toolbar>
+    
+    <div class="content app-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

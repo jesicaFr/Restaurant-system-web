@@ -1,0 +1,3 @@
+.page { display: flex; flex-direction: column; gap: 1.5rem; }
+.form-card { max-width: 400px; }
+.result-card { max-width: 400px; }
