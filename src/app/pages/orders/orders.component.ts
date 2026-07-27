@@ -74,6 +74,11 @@ export class OrdersComponent implements OnInit {
     this.orderService.createOrder(payload).subscribe({
       next: (createdOrder) => {
         this.orders = [createdOrder, ...this.orders];
+        this.tables = this.tables.map((table) =>
+          table.id === payload.tableId
+            ? { ...table, isOccupied: true, status: 'Ocupada' }
+            : table
+        );
         this.draftItems = [];
         this.orderForm.reset({ tableId: null, status: 'Pendiente', paymentMethod: 'Efectivo' });
         this.cdr.detectChanges();

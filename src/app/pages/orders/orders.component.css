@@ -22,6 +22,20 @@
 .order-card ::ng-deep .mat-mdc-select-value-text { white-space: nowrap; font-size: 0.82rem; }
 .order-card ::ng-deep .mat-mdc-select-min-line { white-space: nowrap; }
 .table-availability { display: flex; flex-direction: column; gap: 0.75rem; }
-.table-availability h3 { margin: 0; }
+.table-availability h3 { margin: 0; color: #3c302b; font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; }
 .tables-status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.table-status-card { min-height: 150px; border-radius: 16px; border: 1px solid transparent; border-left-width: 5px; overflow: hidden; }
+.table-status-card mat-card-title { padding: 1rem 1.15rem 0; font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 1.3rem; }
+.table-status-card mat-card-content { padding: 0.4rem 1.15rem; }
+.table-status-card .availability-label { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0; padding: 0.3rem 0.6rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+.table-status-card .availability-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.table-status-card mat-card-actions { padding: 0.4rem 1.15rem 1rem; font-weight: 600; }
+.table-status-card.is-available { background: linear-gradient(135deg, #f5fbf4, #e2f2e2); border-color: #a8cea9; border-left-color: #378348; }
+.table-status-card.is-available mat-card-title { color: #245e31; }
+.table-status-card.is-available .availability-label { background: #cce8cf; color: #216b32; }
+.table-status-card.is-available mat-card-actions { color: #2f7940; }
+.table-status-card.is-occupied { background: linear-gradient(135deg, #fff5f3, #f9dfdb); border-color: #e8b3ac; border-left-color: #bb4a42; }
+.table-status-card.is-occupied mat-card-title { color: #8d302b; }
+.table-status-card.is-occupied .availability-label { background: #f2c9c3; color: #a53b34; }
+.table-status-card.is-occupied button { background: #a9433b; color: #fff; }
 .full-width { width: 100%; }

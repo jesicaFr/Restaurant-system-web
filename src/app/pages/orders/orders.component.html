@@ -87,10 +87,10 @@
   <section class="table-availability">
     <h3>Disponibilidad de mesas</h3>
     <div class="tables-status-grid">
-      <mat-card *ngFor="let table of tables">
+      <mat-card *ngFor="let table of tables" class="table-status-card" [class.is-available]="!table.isOccupied" [class.is-occupied]="table.isOccupied">
         <mat-card-title>Mesa {{ table.number }}</mat-card-title>
         <mat-card-content>
-          <p>{{ table.isOccupied ? 'Ocupada' : 'Disponible' }}</p>
+          <p class="availability-label">{{ table.isOccupied ? 'Ocupada' : 'Disponible' }}</p>
         </mat-card-content>
         <mat-card-actions>
           <button mat-button color="primary" *ngIf="table.isOccupied" (click)="releaseTable(table)">Liberar mesa</button>
