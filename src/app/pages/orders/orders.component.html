@@ -1,7 +1,9 @@
 <div class="page">
   <div class="page-header">
-    <h2>Orden de pedidos</h2>
+    <h2>Pedidos</h2>
   </div>
+
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
   <form [formGroup]="orderForm" (ngSubmit)="createOrder()" class="form-card">
     <mat-card>
@@ -104,7 +106,10 @@
       <mat-card-content>
         <p><strong>Mesa:</strong> {{ order.tableId }}</p>
         <p><strong>Fecha:</strong> {{ order.orderDate | date:'short' }}</p>
-        <p><strong>Estado:</strong> {{ order.status }}</p>
+        <p class="status-row">
+          <strong>Estado:</strong>
+          <span class="status-badge" [class.status-pending]="order.status === 'Pendiente' || order.status === 'Pending'" [class.status-preparing]="order.status === 'En preparación'" [class.status-delivered]="order.status === 'Entregado'">{{ order.status }}</span>
+        </p>
         <p><strong>Pago:</strong> {{ order.paymentMethod }}</p>
         <p><strong>Total:</strong> {{ order.totalAmount | currency }}</p>
         <ul>
@@ -112,12 +117,13 @@
         </ul>
       </mat-card-content>
       <mat-card-actions>
-        <mat-form-field appearance="outline">
+        <mat-form-field *ngIf="order.status !== 'Entregado'" appearance="outline">
           <mat-label>Estado</mat-label>
           <mat-select [ngModel]="order.status" [ngModelOptions]="{standalone: true}" (ngModelChange)="updateStatus(order, $event)">
             <mat-option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</mat-option>
           </mat-select>
         </mat-form-field>
+        <span *ngIf="order.status === 'Entregado'">Pedido cobrado y cerrado</span>
         <button mat-button color="warn" (click)="deleteOrder(order.id)">Eliminar</button>
       </mat-card-actions>
     </mat-card>

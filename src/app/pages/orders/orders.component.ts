@@ -28,10 +28,11 @@ export class OrdersComponent implements OnInit {
   menuItems: MenuItem[] = [];
   draftItems: Array<{ menuItemId: number; name: string; quantity: number; unitPrice: number }> = [];
   displayedColumns = ['name', 'quantity', 'price', 'total', 'actions'];
-  readonly orderStatuses = ['Pendiente', 'En preparación', 'Entregado', 'Disponible'];
+  readonly orderStatuses = ['Pendiente', 'En preparación', 'Entregado'];
   selectedMenuItemId: number | null = null;
   selectedQuantity = 1;
   orderForm: FormGroup;
+  errorMessage = '';
 
   constructor(
     private readonly fb: FormBuilder,
@@ -61,6 +62,8 @@ export class OrdersComponent implements OnInit {
       return;
     }
 
+    this.errorMessage = '';
+
     const payload: CreateOrderRequest = {
       tableId: this.orderForm.value.tableId,
       status: this.orderForm.value.status,
@@ -68,12 +71,19 @@ export class OrdersComponent implements OnInit {
       items: this.draftItems.map((item) => ({ menuItemId: item.menuItemId, quantity: item.quantity }))
     };
 
-    this.orderService.createOrder(payload).subscribe(() => {
-      this.draftItems = [];
-      this.orderForm.reset({ tableId: null, status: 'Pendiente', paymentMethod: 'Efectivo' });
-      this.cdr.markForCheck();
-      this.loadOrders();
-      this.loadTables();
+    this.orderService.createOrder(payload).subscribe({
+      next: (createdOrder) => {
+        this.orders = [createdOrder, ...this.orders];
+        this.draftItems = [];
+        this.orderForm.reset({ tableId: null, status: 'Pendiente', paymentMethod: 'Efectivo' });
+        this.cdr.detectChanges();
+        this.loadOrders();
+        this.loadTables();
+      },
+      error: () => {
+        this.errorMessage = 'No se pudo guardar el pedido. Verificá que la mesa siga disponible.';
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -112,18 +122,6 @@ export class OrdersComponent implements OnInit {
   }
 
   releaseTable(table: Table): void {
-    const activeOrder = this.orders.find((order) =>
-      order.tableId === table.id && order.status !== 'Disponible'
-    );
-
-    if (activeOrder) {
-      this.orderService.updateStatus(activeOrder.id, 'Disponible').subscribe(() => {
-        this.loadOrders();
-        this.loadTables();
-      });
-      return;
-    }
-
     this.tableService.updateTable(table.id, {
       number: table.number,
       capacity: table.capacity,
@@ -142,7 +140,7 @@ export class OrdersComponent implements OnInit {
   private loadOrders(): void {
     this.orderService.getOrders().subscribe((orders) => {
       this.orders = orders;
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
     });
   }
 

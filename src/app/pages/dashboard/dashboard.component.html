@@ -15,7 +15,7 @@
       <mat-card-title class="stat-title">Mesas ocupadas</mat-card-title>
       <mat-card-content><div class="stat-number">{{ occupiedTables }}</div></mat-card-content>
     </mat-card>
-    <mat-card class="stat-card accent-3">
+    <mat-card class="stat-card accent-3" [class.tables-available]="availableTables > 0" [class.no-tables-available]="availableTables === 0">
       <div class="card-top"></div>
       <mat-card-title class="stat-title">Mesas disponibles</mat-card-title>
       <mat-card-content><div class="stat-number">{{ availableTables }}</div></mat-card-content>
