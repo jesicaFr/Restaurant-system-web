@@ -14,16 +14,8 @@ export class OrderService {
     return this.http.get<Order[]>(this.apiUrl);
   }
 
-  getOrder(id: number): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${id}`);
-  }
-
   createOrder(order: CreateOrderRequest): Observable<Order> {
     return this.http.post<Order>(this.apiUrl, order);
-  }
-
-  updateOrder(id: number, order: Partial<Order>): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/${id}`, order);
   }
 
   updateStatus(id: number, status: string): Observable<Order> {

@@ -1,74 +1,54 @@
-import { ChangeDetectorRef,Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { TableService } from '../../core/services/table.service';
-import { OrderService } from '../../core/services/order.service';
-import { Table } from '../../core/models/table.model';
+import { catchError, forkJoin, of } from 'rxjs';
 import { Order } from '../../core/models/order.model';
+import { Table } from '../../core/models/table.model';
+import { OrderService } from '../../core/services/order.service';
+import { TableService } from '../../core/services/table.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, RouterLink],
+  imports: [CommonModule, MatCardModule, MatButtonModule, RouterLink],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
   totalTables = 0;
   occupiedTables = 0;
   availableTables = 0;
   activeOrders = 0;
+  errorMessage = '';
 
   constructor(
     private readonly tableService: TableService,
     private readonly orderService: OrderService,
-     private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
   ) {}
-
-  errorMessage = '';
 
   ngOnInit(): void {
     forkJoin({
-      tables: this.tableService.getTables().pipe(catchError((error) => {
-        console.error('Error cargando estadísticas de mesas', error);
-        this.errorMessage = 'No se pudieron cargar los datos de mesas';
-        return of([] as Table[]);
-      })),
-      orders: this.orderService.getOrders().pipe(catchError((error) => {
-        console.error('Error cargando estadísticas de pedidos', error);
-        this.errorMessage = 'No se pudieron cargar los datos de pedidos';
-        return of([] as Order[]);
-      }))
-    }).subscribe({
-      next: ({ tables, orders }) => {
-        console.log({ tables, orders });
-        this.totalTables = tables.length;
-        this.occupiedTables = tables.filter((table) => table.isOccupied).length;
-        this.availableTables = tables.filter((table) => !table.isOccupied).length;
-        this.activeOrders = orders.filter((order) => order.status !== 'Entregado').length;
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.errorMessage = 'Error cargando el dashboard';
-      }
+      tables: this.tableService.getTables().pipe(
+        catchError(() => {
+          this.errorMessage = 'No se pudieron cargar los datos de mesas.';
+          return of([] as Table[]);
+        }),
+      ),
+      orders: this.orderService.getOrders().pipe(
+        catchError(() => {
+          this.errorMessage = 'No se pudieron cargar los datos de pedidos.';
+          return of([] as Order[]);
+        }),
+      ),
+    }).subscribe(({ tables, orders }) => {
+      this.totalTables = tables.length;
+      this.occupiedTables = tables.filter((table) => table.isOccupied).length;
+      this.availableTables = tables.filter((table) => !table.isOccupied).length;
+      this.activeOrders = orders.filter((order) => order.status !== 'Entregado').length;
+      this.cdr.markForCheck();
     });
   }
-
-  private loadOrderStats(): void {
-    this.orderService.getOrders().subscribe({
-      next: (orders: Order[]) => {
-        console.log('Dashboard orders', orders);
-        this.activeOrders = orders.filter((order) => order.status !== 'Entregado').length;
-      },
-      error: (error) => {
-        console.error('Error cargando estadísticas de pedidos', error);
-      }
-    });
-  }
-
 }

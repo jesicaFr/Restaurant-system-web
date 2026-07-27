@@ -1,53 +1,53 @@
 /* Shell base */
-.app-shell { 
-  height: 100vh; 
-  background-color: #F8F4EF;
+.app-shell {
+  height: 100vh;
+  background-color: #f8f4ef;
   border-radius: 0 !important;
 }
 
 .main-content-container {
-  background-color: #F8F4EF;
+  background-color: #f8f4ef;
 }
 
 /* Sidebar principal */
-.sidebar { 
-  width: 240px; 
-  padding: 1.5rem 1rem; 
-  background: #2C211F !important; 
-  color: #fff; 
+.sidebar {
+  width: 240px;
+  padding: 1.5rem 1rem;
+  background: #2c211f !important;
+  color: #fff;
   border-right: none !important;
-  box-shadow: inset -1px 0 0 rgba(255,255,255,0.06); 
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
   border-radius: 0 !important;
   margin: 0 !important;
 }
 
 /* Brand / Logo superior */
-.brand { 
-  font-size: 1.2rem; 
-  font-weight: 700; 
-  padding: 0 0.5rem 1.75rem 1.1875rem; 
-  display: flex; 
-  align-items: center; 
-  gap: 0.25rem; 
-  font-family: 'Roboto', sans-serif; 
-  color: #ffffff !important; 
+.brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0 0.5rem 1.75rem 1.1875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: 'Roboto', sans-serif;
+  color: #ffffff !important;
 }
 
-.brand-icon { 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  width: 28px; 
-  height: 36px; 
-  border-radius: 10px; 
-  background: rgba(255,255,255,0.08); 
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
   font-size: 1.1rem;
 }
 
 /* Contenedor de la lista */
-mat-nav-list { 
-  margin-top: 0.5rem; 
-  padding: 0 !important; 
+mat-nav-list {
+  margin-top: 0.5rem;
+  padding: 0 !important;
 }
 
 /* RESET COMPLETO DE VARIABLES MATERIAL MDC */
@@ -57,10 +57,10 @@ mat-nav-list {
   --mdc-list-item-focus-container-color: transparent !important;
   --mdc-list-item-selected-container-color: transparent !important;
   --mdc-list-item-activated-container-color: transparent !important;
-  
-  border-radius: 10px !important; 
-  margin: 0.35rem 0 !important; 
-  transition: all 0.2s ease !important; 
+
+  border-radius: 10px !important;
+  margin: 0.35rem 0 !important;
+  transition: all 0.2s ease !important;
   border: 1px solid transparent !important;
   height: 48px !important;
   background: transparent !important;
@@ -102,15 +102,15 @@ mat-nav-list {
 
 ::ng-deep a.mat-mdc-list-item mat-icon {
   margin-right: 0 !important;
-  color: #C5BBB7 !important;
+  color: #c5bbb7 !important;
   font-size: 1.35rem !important;
   width: 24px !important;
   height: 24px !important;
   line-height: 24px !important;
 }
 
-::ng-deep a.mat-mdc-list-item .mdc-list-item__primary-text { 
-  color: #C5BBB7 !important; 
+::ng-deep a.mat-mdc-list-item .mdc-list-item__primary-text {
+  color: #c5bbb7 !important;
   font-size: 0.95rem !important;
   font-weight: 500 !important;
   line-height: 24px !important;
@@ -128,35 +128,35 @@ mat-nav-list {
 }
 
 /* Hover */
-::ng-deep a.mat-mdc-list-item:hover { 
-  background: rgba(255, 255, 255, 0.05) !important; 
+::ng-deep a.mat-mdc-list-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 ::ng-deep a.mat-mdc-list-item:hover .mdc-list-item__primary-text,
-::ng-deep a.mat-mdc-list-item:hover mat-icon { 
-  color: #ffffff !important; 
+::ng-deep a.mat-mdc-list-item:hover mat-icon {
+  color: #ffffff !important;
 }
 
 /* Estado Activo (Borde fino y suave) */
-::ng-deep a.mat-mdc-list-item.active { 
-  background: rgba(255, 255, 255, 0.04) !important; 
-  border: 1px solid #6B5B53 !important; 
+::ng-deep a.mat-mdc-list-item.active {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid #6b5b53 !important;
   border-radius: 10px !important;
 }
 
 ::ng-deep a.mat-mdc-list-item.active .mdc-list-item__primary-text,
-::ng-deep a.mat-mdc-list-item.active mat-icon { 
-  color: #ffffff !important; 
+::ng-deep a.mat-mdc-list-item.active mat-icon {
+  color: #ffffff !important;
   font-weight: 600 !important;
 }
 
 /* Topbar superior */
-.topbar { 
-  height: 56px; 
-  background: #2C211F; 
-  color: #fff; 
-  padding-left: 1.5rem; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+.topbar {
+  height: 56px;
+  background: #2c211f;
+  color: #fff;
+  padding-left: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   border-radius: 0 !important;
 }
 
@@ -166,8 +166,20 @@ mat-nav-list {
   border-radius: 0 !important;
 }
 
-.topbar button { margin-right: 0.5rem; }
-.topbar span { font-family: 'Roboto', sans-serif; font-size: 0.95rem; font-weight: 500; opacity: 0.9; }
+.topbar button {
+  margin-right: 0.5rem;
+}
+.topbar span {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
 
-.content { padding: 1.75rem; }
-.app-content { max-width: 1200px; margin: 0 auto; }
+.content {
+  padding: 1.75rem;
+}
+.app-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}

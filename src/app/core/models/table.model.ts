@@ -9,6 +9,5 @@ export interface Table {
 export interface CreateTableRequest {
   number: string;
   capacity: number;
-  status: string;
   isOccupied: boolean;
 }

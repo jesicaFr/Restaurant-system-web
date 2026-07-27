@@ -3,28 +3,45 @@
     <h2>Productos</h2>
   </div>
 
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
   <form [formGroup]="itemForm" (ngSubmit)="saveItem()" class="form-card">
     <mat-card>
-      <mat-card-title>{{ editingId ? 'Editar producto' : 'Crear producto' }}</mat-card-title>
+      <mat-card-title>{{
+        editingId !== null ? 'Editar producto' : 'Crear producto'
+      }}</mat-card-title>
       <mat-card-content>
         <div class="form-grid">
           <mat-form-field>
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="name" />
+            <mat-error *ngIf="itemForm.get('name')?.hasError('required')"
+              >El nombre es obligatorio.</mat-error
+            >
           </mat-form-field>
           <mat-form-field>
             <mat-label>Precio</mat-label>
-            <input matInput type="number" formControlName="price" />
+            <input matInput type="number" min="0" step="0.01" formControlName="price" />
+            <mat-error *ngIf="itemForm.get('price')?.hasError('min')"
+              >El precio no puede ser negativo.</mat-error
+            >
           </mat-form-field>
           <mat-form-field>
             <mat-label>Cantidad en stock</mat-label>
             <input matInput type="number" min="0" step="1" formControlName="quantity" />
-            <mat-error *ngIf="itemForm.get('quantity')?.hasError('min')">La cantidad no puede ser negativa.</mat-error>
-            <mat-error *ngIf="itemForm.get('quantity')?.hasError('pattern')">Ingresá un número entero.</mat-error>
+            <mat-error *ngIf="itemForm.get('quantity')?.hasError('min')"
+              >La cantidad no puede ser negativa.</mat-error
+            >
+            <mat-error *ngIf="itemForm.get('quantity')?.hasError('pattern')"
+              >Ingresá un número entero.</mat-error
+            >
           </mat-form-field>
           <mat-form-field>
             <mat-label>Descripción</mat-label>
             <textarea matInput formControlName="description"></textarea>
+            <mat-error *ngIf="itemForm.get('description')?.hasError('required')"
+              >La descripción es obligatoria.</mat-error
+            >
           </mat-form-field>
           <mat-form-field>
             <mat-label>Disponibilidad</mat-label>
@@ -37,9 +54,11 @@
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button color="primary" type="submit" [disabled]="itemForm.invalid">
-          {{ editingId ? 'Guardar cambios' : 'Crear producto' }}
+          {{ editingId !== null ? 'Guardar cambios' : 'Crear producto' }}
         </button>
-        <button *ngIf="editingId" mat-button type="button" (click)="resetForm()">Cancelar</button>
+        <button *ngIf="editingId !== null" mat-button type="button" (click)="resetForm()">
+          Cancelar
+        </button>
       </mat-card-actions>
     </mat-card>
   </form>
@@ -63,17 +82,35 @@
     </ng-container>
     <ng-container matColumnDef="isAvailable">
       <th mat-header-cell *matHeaderCellDef>Estado</th>
-      <td mat-cell *matCellDef="let item">{{ item.isAvailable ? 'Disponible' : 'No disponible' }}</td>
+      <td mat-cell *matCellDef="let item">
+        {{ item.isAvailable ? 'Disponible' : 'No disponible' }}
+      </td>
     </ng-container>
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Acciones</th>
       <td mat-cell *matCellDef="let item">
-        <button mat-icon-button color="primary" (click)="editItem(item)"><mat-icon>edit</mat-icon></button>
-        <button mat-icon-button color="warn" (click)="deleteItem(item.id)"><mat-icon>delete</mat-icon></button>
+        <button
+          mat-icon-button
+          color="primary"
+          type="button"
+          aria-label="Editar producto"
+          (click)="editItem(item)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          type="button"
+          aria-label="Eliminar producto"
+          (click)="deleteItem(item.id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
       </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
 </div>

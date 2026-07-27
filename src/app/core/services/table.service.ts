@@ -14,10 +14,6 @@ export class TableService {
     return this.http.get<Table[]>(this.apiUrl);
   }
 
-  getTable(id: number): Observable<Table> {
-    return this.http.get<Table>(`${this.apiUrl}/${id}`);
-  }
-
   createTable(table: CreateTableRequest): Observable<Table> {
     return this.http.post<Table>(this.apiUrl, table);
   }

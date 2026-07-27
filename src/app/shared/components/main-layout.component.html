@@ -4,16 +4,20 @@
       <span class="brand-icon">🍴</span>
       <span>Restaurante</span>
     </div>
-    
+
     <mat-nav-list>
       <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
         <span class="nav-link-content"><mat-icon>dashboard</mat-icon><span>Panel</span></span>
       </a>
       <a mat-list-item routerLink="/tables" routerLinkActive="active">
-        <span class="nav-link-content"><mat-icon>table_restaurant</mat-icon><span>Mesas</span></span>
+        <span class="nav-link-content"
+          ><mat-icon>table_restaurant</mat-icon><span>Mesas</span></span
+        >
       </a>
       <a mat-list-item routerLink="/menu-items" routerLinkActive="active">
-        <span class="nav-link-content"><mat-icon>restaurant_menu</mat-icon><span>Productos</span></span>
+        <span class="nav-link-content"
+          ><mat-icon>restaurant_menu</mat-icon><span>Productos</span></span
+        >
       </a>
       <a mat-list-item routerLink="/orders" routerLinkActive="active">
         <span class="nav-link-content"><mat-icon>receipt_long</mat-icon><span>Pedidos</span></span>
@@ -31,7 +35,7 @@
       </button>
       <span>Sistema de gestión de restaurante</span>
     </mat-toolbar>
-    
+
     <div class="content app-content">
       <router-outlet></router-outlet>
     </div>

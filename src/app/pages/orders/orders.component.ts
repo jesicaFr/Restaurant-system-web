@@ -1,34 +1,59 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { CreateOrderRequest, Order } from '../../core/models/order.model';
+import { MenuItem } from '../../core/models/menu-item.model';
+import { Table } from '../../core/models/table.model';
+import { MenuItemService } from '../../core/services/menu-item.service';
 import { OrderService } from '../../core/services/order.service';
 import { TableService } from '../../core/services/table.service';
-import { MenuItemService } from '../../core/services/menu-item.service';
-import { CreateOrderRequest, Order, OrderDetail } from '../../core/models/order.model';
-import { Table } from '../../core/models/table.model';
-import { MenuItem } from '../../core/models/menu-item.model';
+
+interface DraftOrderItem {
+  menuItemId: number;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+}
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatTableModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTableModule,
+  ],
   templateUrl: './orders.component.html',
-  styleUrls: ['./orders.component.css']
+  styleUrls: ['./orders.component.css'],
 })
 export class OrdersComponent implements OnInit {
+  readonly displayedColumns = ['name', 'quantity', 'price', 'total', 'actions'];
+  readonly orderStatuses = ['Pendiente', 'En preparación', 'Entregado'];
+
   orders: Order[] = [];
   tables: Table[] = [];
   menuItems: MenuItem[] = [];
-  draftItems: Array<{ menuItemId: number; name: string; quantity: number; unitPrice: number }> = [];
-  displayedColumns = ['name', 'quantity', 'price', 'total', 'actions'];
-  readonly orderStatuses = ['Pendiente', 'En preparación', 'Entregado'];
+  draftItems: DraftOrderItem[] = [];
   selectedMenuItemId: number | null = null;
   selectedQuantity = 1;
   orderForm: FormGroup;
@@ -39,12 +64,12 @@ export class OrdersComponent implements OnInit {
     private readonly orderService: OrderService,
     private readonly tableService: TableService,
     private readonly menuItemService: MenuItemService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.orderForm = this.fb.group({
       tableId: [null, Validators.required],
       status: ['Pendiente', Validators.required],
-      paymentMethod: ['Efectivo', Validators.required]
+      paymentMethod: ['Efectivo', Validators.required],
     });
   }
 
@@ -54,66 +79,88 @@ export class OrdersComponent implements OnInit {
     this.loadMenuItems();
   }
 
+  get availableTables(): Table[] {
+    return this.tables.filter((table) => !table.isOccupied);
+  }
+
   createOrder(): void {
     if (this.orderForm.invalid || this.draftItems.length === 0) {
+      this.orderForm.markAllAsTouched();
       return;
     }
 
-    this.errorMessage = '';
-
     const payload: CreateOrderRequest = {
-      tableId: this.orderForm.value.tableId,
-      status: this.orderForm.value.status,
-      paymentMethod: this.orderForm.value.paymentMethod,
-      items: this.draftItems.map((item) => ({ menuItemId: item.menuItemId, quantity: item.quantity }))
+      tableId: Number(this.orderForm.value.tableId),
+      status: String(this.orderForm.value.status),
+      paymentMethod: String(this.orderForm.value.paymentMethod),
+      items: this.draftItems.map((item) => ({
+        menuItemId: item.menuItemId,
+        quantity: item.quantity,
+      })),
     };
 
+    this.errorMessage = '';
     this.orderService.createOrder(payload).subscribe({
-      next: (createdOrder) => {
-        this.orders = [createdOrder, ...this.orders];
-        this.tables = this.tables.map((table) =>
-          table.id === payload.tableId
-            ? { ...table, isOccupied: true, status: 'Ocupada' }
-            : table
-        );
+      next: () => {
         this.draftItems = [];
-        this.orderForm.reset({ tableId: null, status: 'Pendiente', paymentMethod: 'Efectivo' });
-        this.cdr.detectChanges();
+        this.selectedMenuItemId = null;
+        this.selectedQuantity = 1;
+        this.orderForm.reset({
+          tableId: null,
+          status: 'Pendiente',
+          paymentMethod: 'Efectivo',
+        });
         this.loadOrders();
         this.loadTables();
         this.loadMenuItems();
       },
-      error: () => {
-        this.errorMessage = 'No se pudo guardar el pedido. Verificá que la mesa siga disponible.';
-        this.cdr.detectChanges();
-      }
+      error: () =>
+        this.showError('No se pudo guardar el pedido. Verificá la mesa y el stock disponible.'),
     });
   }
 
   addItem(): void {
-    if (!this.selectedMenuItemId) {
+    const quantity = Number(this.selectedQuantity);
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      this.showError('La cantidad debe ser un número entero mayor que cero.');
+      return;
+    }
+
+    if (this.selectedMenuItemId === null) {
+      this.showError('Seleccioná un producto.');
       return;
     }
 
     const item = this.menuItems.find((menuItem) => menuItem.id === this.selectedMenuItemId);
-    const quantityAlreadyAdded = this.draftItems
-      .filter((draftItem) => draftItem.menuItemId === this.selectedMenuItemId)
-      .reduce((total, draftItem) => total + draftItem.quantity, 0);
+    const existingDraft = this.draftItems.find(
+      (draftItem) => draftItem.menuItemId === this.selectedMenuItemId,
+    );
+    const requestedQuantity = (existingDraft?.quantity ?? 0) + quantity;
 
-    if (!item || !item.isAvailable || item.quantity < quantityAlreadyAdded + this.selectedQuantity) {
-      this.errorMessage = 'No hay stock suficiente para agregar ese producto.';
-      this.cdr.detectChanges();
+    if (!item || !item.isAvailable || item.quantity < requestedQuantity) {
+      this.showError('No hay stock suficiente para agregar ese producto.');
       return;
     }
 
-    this.draftItems = [...this.draftItems, {
-      menuItemId: item.id,
-      name: item.name,
-      quantity: this.selectedQuantity,
-      unitPrice: item.price
-    }];
+    this.draftItems = existingDraft
+      ? this.draftItems.map((draftItem) =>
+          draftItem.menuItemId === item.id
+            ? { ...draftItem, quantity: requestedQuantity }
+            : draftItem,
+        )
+      : [
+          ...this.draftItems,
+          {
+            menuItemId: item.id,
+            name: item.name,
+            quantity,
+            unitPrice: item.price,
+          },
+        ];
+
     this.selectedMenuItemId = null;
     this.selectedQuantity = 1;
+    this.errorMessage = '';
   }
 
   removeItem(index: number): void {
@@ -124,50 +171,72 @@ export class OrdersComponent implements OnInit {
     if (status === order.status) {
       return;
     }
-    this.orderService.updateStatus(order.id, status).subscribe(() => {
-      this.loadOrders();
-      this.loadTables();
+
+    this.orderService.updateStatus(order.id, status).subscribe({
+      next: () => {
+        this.loadOrders();
+        this.loadTables();
+      },
+      error: () => this.showError('No se pudo actualizar el estado del pedido.'),
     });
   }
 
   releaseTable(table: Table): void {
-    this.tableService.updateTable(table.id, {
-      number: table.number,
-      capacity: table.capacity,
-      status: 'Disponible',
-      isOccupied: false
-    }).subscribe(() => this.loadTables());
+    this.tableService
+      .updateTable(table.id, {
+        number: table.number,
+        capacity: table.capacity,
+        isOccupied: false,
+      })
+      .subscribe({
+        next: () => this.loadTables(),
+        error: () => this.showError('No se pudo liberar la mesa.'),
+      });
   }
 
   deleteOrder(id: number): void {
     if (!confirm('¿Desea eliminar este pedido?')) {
       return;
     }
-    this.orderService.deleteOrder(id).subscribe(() => this.loadOrders());
-  }
 
-  private loadOrders(): void {
-    this.orderService.getOrders().subscribe((orders) => {
-      this.orders = orders;
-      this.cdr.detectChanges();
+    this.orderService.deleteOrder(id).subscribe({
+      next: () => this.loadOrders(),
+      error: () => this.showError('No se pudo eliminar el pedido.'),
     });
   }
 
-  get availableTables(): Table[] {
-    return this.tables.filter((table) => !table.isOccupied);
+  private loadOrders(): void {
+    this.orderService.getOrders().subscribe({
+      next: (orders) => {
+        this.orders = orders;
+        this.cdr.markForCheck();
+      },
+      error: () => this.showError('No se pudieron cargar los pedidos.'),
+    });
   }
 
   private loadTables(): void {
-    this.tableService.getTables().subscribe((tables) => {
-      this.tables = tables;
-      this.cdr.markForCheck();
+    this.tableService.getTables().subscribe({
+      next: (tables) => {
+        this.tables = tables;
+        this.cdr.markForCheck();
+      },
+      error: () => this.showError('No se pudieron cargar las mesas.'),
     });
   }
 
   private loadMenuItems(): void {
-    this.menuItemService.getMenuItems().subscribe((items) => {
-      this.menuItems = items;
-      this.cdr.markForCheck();
+    this.menuItemService.getMenuItems().subscribe({
+      next: (items) => {
+        this.menuItems = items;
+        this.cdr.markForCheck();
+      },
+      error: () => this.showError('No se pudieron cargar los productos.'),
     });
+  }
+
+  private showError(message: string): void {
+    this.errorMessage = message;
+    this.cdr.markForCheck();
   }
 }

@@ -13,7 +13,9 @@
           <mat-form-field>
             <mat-label>Mesa</mat-label>
             <mat-select formControlName="tableId">
-              <mat-option *ngFor="let table of availableTables" [value]="table.id">{{ table.number }} - {{ table.capacity }} personas</mat-option>
+              <mat-option *ngFor="let table of availableTables" [value]="table.id"
+                >{{ table.number }} - {{ table.capacity }} personas</mat-option
+              >
             </mat-select>
             <mat-hint *ngIf="availableTables.length === 0">No hay mesas disponibles.</mat-hint>
           </mat-form-field>
@@ -41,8 +43,9 @@
               <mat-label>Producto</mat-label>
               <mat-select
                 [(ngModel)]="selectedMenuItemId"
-                [ngModelOptions]="{standalone: true}"
-                panelClass="product-select-panel">
+                [ngModelOptions]="{ standalone: true }"
+                panelClass="product-select-panel"
+              >
                 <mat-select-trigger>
                   <ng-container *ngFor="let selected of menuItems">
                     <span *ngIf="selected.id === selectedMenuItemId" class="selected-product">
@@ -55,7 +58,8 @@
                 <mat-option
                   *ngFor="let item of menuItems"
                   [value]="item.id"
-                  [disabled]="!item.isAvailable || item.quantity === 0">
+                  [disabled]="!item.isAvailable || item.quantity === 0"
+                >
                   <span class="product-option">
                     <span class="product-option__name">{{ item.name }}</span>
                     <span class="product-option__price">{{ item.price | currency }}</span>
@@ -66,9 +70,18 @@
             </mat-form-field>
             <mat-form-field>
               <mat-label>Cantidad</mat-label>
-              <input matInput type="number" [(ngModel)]="selectedQuantity" [ngModelOptions]="{standalone: true}" />
+              <input
+                matInput
+                type="number"
+                min="1"
+                step="1"
+                [(ngModel)]="selectedQuantity"
+                [ngModelOptions]="{ standalone: true }"
+              />
             </mat-form-field>
-            <button mat-raised-button color="primary" type="button" (click)="addItem()">Agregar</button>
+            <button mat-raised-button color="primary" type="button" (click)="addItem()">
+              Agregar
+            </button>
           </div>
 
           <table mat-table [dataSource]="draftItems" class="mat-elevation-z2 full-width">
@@ -86,21 +99,38 @@
             </ng-container>
             <ng-container matColumnDef="total">
               <th mat-header-cell *matHeaderCellDef>Total</th>
-              <td mat-cell *matCellDef="let item">{{ item.quantity * item.unitPrice | currency }}</td>
+              <td mat-cell *matCellDef="let item">
+                {{ item.quantity * item.unitPrice | currency }}
+              </td>
             </ng-container>
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>Acciones</th>
               <td mat-cell *matCellDef="let item; let i = index">
-                <button mat-icon-button color="warn" (click)="removeItem(i)"><mat-icon>delete</mat-icon></button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  type="button"
+                  aria-label="Quitar producto"
+                  (click)="removeItem(i)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
               </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" [disabled]="orderForm.invalid || draftItems.length === 0">Guardar pedido</button>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="orderForm.invalid || draftItems.length === 0"
+        >
+          Guardar pedido
+        </button>
       </mat-card-actions>
     </mat-card>
   </form>
@@ -108,13 +138,20 @@
   <section class="table-availability">
     <h3>Disponibilidad de mesas</h3>
     <div class="tables-status-grid">
-      <mat-card *ngFor="let table of tables" class="table-status-card" [class.is-available]="!table.isOccupied" [class.is-occupied]="table.isOccupied">
+      <mat-card
+        *ngFor="let table of tables"
+        class="table-status-card"
+        [class.is-available]="!table.isOccupied"
+        [class.is-occupied]="table.isOccupied"
+      >
         <mat-card-title>Mesa {{ table.number }}</mat-card-title>
         <mat-card-content>
           <p class="availability-label">{{ table.isOccupied ? 'Ocupada' : 'Disponible' }}</p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button color="primary" *ngIf="table.isOccupied" (click)="releaseTable(table)">Liberar mesa</button>
+          <button mat-button color="primary" *ngIf="table.isOccupied" (click)="releaseTable(table)">
+            Liberar mesa
+          </button>
           <span *ngIf="!table.isOccupied">Lista para asignar</span>
         </mat-card-actions>
       </mat-card>
@@ -126,22 +163,36 @@
       <mat-card-title>Pedido #{{ order.id }}</mat-card-title>
       <mat-card-content>
         <p><strong>Mesa:</strong> {{ order.tableId }}</p>
-        <p><strong>Fecha:</strong> {{ order.orderDate | date:'short' }}</p>
+        <p><strong>Fecha:</strong> {{ order.orderDate | date: 'short' }}</p>
         <p class="status-row">
           <strong>Estado:</strong>
-          <span class="status-badge" [class.status-pending]="order.status === 'Pendiente' || order.status === 'Pending'" [class.status-preparing]="order.status === 'En preparación'" [class.status-delivered]="order.status === 'Entregado'">{{ order.status }}</span>
+          <span
+            class="status-badge"
+            [class.status-pending]="order.status === 'Pendiente' || order.status === 'Pending'"
+            [class.status-preparing]="order.status === 'En preparación'"
+            [class.status-delivered]="order.status === 'Entregado'"
+            >{{ order.status }}</span
+          >
         </p>
         <p><strong>Pago:</strong> {{ order.paymentMethod }}</p>
         <p><strong>Total:</strong> {{ order.totalAmount | currency }}</p>
         <ul>
-          <li *ngFor="let detail of order.orderDetails">{{ detail.menuItemName }} x{{ detail.quantity }} - {{ detail.totalPrice | currency }}</li>
+          <li *ngFor="let detail of order.orderDetails">
+            {{ detail.menuItemName }} x{{ detail.quantity }} - {{ detail.totalPrice | currency }}
+          </li>
         </ul>
       </mat-card-content>
       <mat-card-actions>
         <mat-form-field *ngIf="order.status !== 'Entregado'" appearance="outline">
           <mat-label>Estado</mat-label>
-          <mat-select [ngModel]="order.status" [ngModelOptions]="{standalone: true}" (ngModelChange)="updateStatus(order, $event)">
-            <mat-option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</mat-option>
+          <mat-select
+            [ngModel]="order.status"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="updateStatus(order, $event)"
+          >
+            <mat-option *ngFor="let status of orderStatuses" [value]="status">{{
+              status
+            }}</mat-option>
           </mat-select>
         </mat-form-field>
         <span *ngIf="order.status === 'Entregado'">Pedido cobrado y cerrado</span>

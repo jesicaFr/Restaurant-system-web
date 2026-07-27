@@ -1,49 +1,73 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { MenuItemService } from '../../core/services/menu-item.service';
 import { CreateMenuItemRequest, MenuItem } from '../../core/models/menu-item.model';
+import { MenuItemService } from '../../core/services/menu-item.service';
 
 @Component({
   selector: 'app-menu-items',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatTableModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTableModule,
+  ],
   templateUrl: './menu-items.component.html',
-  styleUrls: ['./menu-items.component.css']
+  styleUrls: ['./menu-items.component.css'],
 })
 export class MenuItemsComponent implements OnInit {
+  readonly displayedColumns = [
+    'name',
+    'description',
+    'price',
+    'quantity',
+    'isAvailable',
+    'actions',
+  ];
+  private readonly destroyRef = inject(DestroyRef);
+
   items: MenuItem[] = [];
-  displayedColumns = ['name', 'description', 'price', 'quantity', 'isAvailable', 'actions'];
   itemForm: FormGroup;
   editingId: number | null = null;
+  errorMessage = '';
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly menuItemService: MenuItemService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.itemForm = this.fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
       quantity: [0, [Validators.required, Validators.min(0), Validators.pattern(/^[0-9]+$/)]],
-      isAvailable: [true, Validators.required]
+      isAvailable: [true, Validators.required],
     });
 
-    this.itemForm.get('quantity')?.valueChanges.subscribe((quantity) => {
-      if (quantity === null || quantity === undefined || quantity === '') {
-        return;
-      }
+    this.itemForm
+      .get('quantity')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((quantity) => {
+        if (quantity === null || quantity === undefined || quantity === '') {
+          return;
+        }
 
-      this.itemForm.get('isAvailable')?.setValue(Number(quantity) > 0, { emitEvent: false });
-    });
+        this.itemForm.get('isAvailable')?.setValue(Number(quantity) > 0, { emitEvent: false });
+      });
   }
 
   ngOnInit(): void {
@@ -51,35 +75,56 @@ export class MenuItemsComponent implements OnInit {
   }
 
   loadItems(): void {
-    this.menuItemService.getMenuItems().subscribe((items) => {
-      this.items = items;
-      this.cdr.markForCheck();
+    this.menuItemService.getMenuItems().subscribe({
+      next: (items) => {
+        this.items = items;
+        this.errorMessage = '';
+        this.cdr.markForCheck();
+      },
+      error: () => this.showError('No se pudieron cargar los productos.'),
     });
   }
 
   saveItem(): void {
     if (this.itemForm.invalid) {
+      this.itemForm.markAllAsTouched();
       return;
     }
 
-    const payload: CreateMenuItemRequest = this.itemForm.value;
+    const formValue = this.itemForm.getRawValue();
+    const payload: CreateMenuItemRequest = {
+      name: String(formValue.name).trim(),
+      description: String(formValue.description).trim(),
+      price: Number(formValue.price),
+      quantity: Number(formValue.quantity),
+      isAvailable: Boolean(formValue.isAvailable),
+    };
 
-    if (this.editingId) {
-      this.menuItemService.updateMenuItem(this.editingId, payload).subscribe(() => this.resetFormAndReload());
-      return;
-    }
+    const request =
+      this.editingId !== null
+        ? this.menuItemService.updateMenuItem(this.editingId, payload)
+        : this.menuItemService.createMenuItem(payload);
 
-    this.menuItemService.createMenuItem(payload).subscribe(() => this.resetFormAndReload());
+    request.subscribe({
+      next: () => this.resetFormAndReload(),
+      error: () =>
+        this.showError(
+          this.editingId !== null
+            ? 'No se pudo actualizar el producto.'
+            : 'No se pudo crear el producto.',
+        ),
+    });
   }
 
   editItem(item: MenuItem): void {
     this.editingId = item.id;
+    this.errorMessage = '';
     this.itemForm.patchValue({
       name: item.name,
       description: item.description,
       price: item.price,
       quantity: item.quantity,
-      isAvailable: item.isAvailable
+      isAvailable: item.isAvailable,
     });
   }
 
@@ -87,23 +132,32 @@ export class MenuItemsComponent implements OnInit {
     if (!confirm('¿Desea eliminar este producto?')) {
       return;
     }
-    this.menuItemService.deleteMenuItem(id).subscribe(() => this.loadItems());
+
+    this.menuItemService.deleteMenuItem(id).subscribe({
+      next: () => this.loadItems(),
+      error: () => this.showError('No se pudo eliminar el producto.'),
+    });
   }
 
   resetForm(): void {
     this.editingId = null;
+    this.errorMessage = '';
     this.itemForm.reset({
       name: '',
       description: '',
       price: 0,
       quantity: 0,
-      isAvailable: true
+      isAvailable: true,
     });
   }
 
   private resetFormAndReload(): void {
     this.resetForm();
-    this.cdr.markForCheck();
     this.loadItems();
+  }
+
+  private showError(message: string): void {
+    this.errorMessage = message;
+    this.cdr.markForCheck();
   }
 }

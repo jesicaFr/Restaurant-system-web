@@ -9,15 +9,26 @@
           type="text"
           placeholder="Número, capacidad, estado, ocupada"
           [value]="searchQuery"
-          (input)="onSearch($any($event.target).value)"
+          (input)="onSearch($event)"
         />
-        <button mat-icon-button matSuffix *ngIf="searchQuery" aria-label="Limpiar búsqueda" (click)="onSearch('')">
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          *ngIf="searchQuery"
+          aria-label="Limpiar búsqueda"
+          (click)="clearSearch()"
+        >
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
-      <button mat-raised-button color="primary" (click)="resetForm()">Nueva mesa</button>
+      <button mat-raised-button color="primary" type="button" (click)="resetForm()">
+        Nueva mesa
+      </button>
     </div>
   </div>
+
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
   <form [formGroup]="tableForm" (ngSubmit)="saveTable()" class="form-card">
     <mat-card>
@@ -27,19 +38,36 @@
           <mat-form-field>
             <mat-label>Número</mat-label>
             <input matInput formControlName="number" />
-            <mat-error *ngIf="tableForm.get('number')?.hasError('required')">El número es obligatorio.</mat-error>
-            <mat-error *ngIf="tableForm.get('number')?.hasError('duplicate')">Ya existe una mesa con ese número.</mat-error>
+            <mat-error *ngIf="tableForm.get('number')?.hasError('required')"
+              >El número es obligatorio.</mat-error
+            >
+            <mat-error *ngIf="tableForm.get('number')?.hasError('duplicate')"
+              >Ya existe una mesa con ese número.</mat-error
+            >
           </mat-form-field>
           <mat-form-field>
             <mat-label>Capacidad</mat-label>
-            <input matInput class="capacity-input" type="number" min="2" step="1" formControlName="capacity" />
-            <mat-error *ngIf="tableForm.get('capacity')?.hasError('min')">La capacidad debe ser 2 o más.</mat-error>
-            <mat-error *ngIf="tableForm.get('capacity')?.hasError('pattern')">Ingresá un número entero.</mat-error>
+            <input
+              matInput
+              class="capacity-input"
+              type="number"
+              min="2"
+              step="1"
+              formControlName="capacity"
+            />
+            <mat-error *ngIf="tableForm.get('capacity')?.hasError('min')"
+              >La capacidad debe ser 2 o más.</mat-error
+            >
+            <mat-error *ngIf="tableForm.get('capacity')?.hasError('pattern')"
+              >Ingresá un número entero.</mat-error
+            >
           </mat-form-field>
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" [disabled]="tableForm.invalid">Guardar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="tableForm.invalid">
+          Guardar
+        </button>
         <button mat-button type="button" (click)="resetForm()">Cancelar</button>
       </mat-card-actions>
     </mat-card>
@@ -54,11 +82,28 @@
         <p><strong>Disponibilidad:</strong> {{ table.isOccupied ? 'Ocupada' : 'Disponible' }}</p>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-icon-button color="primary" (click)="editTable(table)"><mat-icon>edit</mat-icon></button>
-        <button mat-icon-button color="warn" (click)="deleteTable(table.id)"><mat-icon>delete</mat-icon></button>
+        <button
+          mat-icon-button
+          color="primary"
+          type="button"
+          aria-label="Editar mesa"
+          (click)="editTable(table)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          type="button"
+          aria-label="Eliminar mesa"
+          (click)="deleteTable(table.id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>
+
   <div class="empty-state" *ngIf="filteredTables.length === 0">
     No se encontraron mesas que coincidan con "{{ searchQuery }}".
   </div>

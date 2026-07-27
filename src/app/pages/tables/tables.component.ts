@@ -1,40 +1,47 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { TableService } from '../../core/services/table.service';
 import { CreateTableRequest, Table } from '../../core/models/table.model';
+import { TableService } from '../../core/services/table.service';
 
 @Component({
   selector: 'app-tables',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   templateUrl: './tables.component.html',
-  styleUrls: ['./tables.component.css']
+  styleUrls: ['./tables.component.css'],
 })
 export class TablesComponent implements OnInit {
   tables: Table[] = [];
   tableForm: FormGroup;
   editingId: number | null = null;
   searchQuery = '';
+  errorMessage = '';
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly tableService: TableService,
-    private readonly dialog: MatDialog,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.tableForm = this.fb.group({
       number: ['', Validators.required],
       capacity: [null, [Validators.required, Validators.min(2), Validators.pattern(/^[0-9]+$/)]],
-      status: ['Disponible', Validators.required],
-      isOccupied: [false, Validators.required]
+      isOccupied: [false, Validators.required],
     });
   }
 
@@ -42,39 +49,50 @@ export class TablesComponent implements OnInit {
     this.loadTables();
   }
 
-  loadTables(): void {
-    this.tableService.getTables().subscribe((tables) => {
-      this.tables = tables;
-      this.cdr.markForCheck();
-    });
-  }
-
   get filteredTables(): Table[] {
-    if (!this.searchQuery.trim()) {
+    const query = this.searchQuery.trim().toLowerCase();
+    if (!query) {
       return this.tables;
     }
 
-    const query = this.searchQuery.toLowerCase();
-    return this.tables.filter((table) =>
-      table.number.toLowerCase().includes(query) ||
-      String(table.capacity).includes(query) ||
-      table.status.toLowerCase().includes(query) ||
-      (table.isOccupied ? 'ocupada' : 'disponible').includes(query)
+    return this.tables.filter(
+      (table) =>
+        table.number.toLowerCase().includes(query) ||
+        String(table.capacity).includes(query) ||
+        table.status.toLowerCase().includes(query) ||
+        (table.isOccupied ? 'ocupada' : 'disponible').includes(query),
     );
   }
 
-  onSearch(query: string): void {
-    this.searchQuery = query;
+  loadTables(): void {
+    this.tableService.getTables().subscribe({
+      next: (tables) => {
+        this.tables = tables;
+        this.errorMessage = '';
+        this.cdr.markForCheck();
+      },
+      error: () => this.showError('No se pudieron cargar las mesas.'),
+    });
+  }
+
+  onSearch(event: Event): void {
+    this.searchQuery = (event.target as HTMLInputElement).value;
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
   }
 
   saveTable(): void {
     if (this.tableForm.invalid) {
+      this.tableForm.markAllAsTouched();
       return;
     }
 
-    const number = this.tableForm.value.number.trim();
-    const isDuplicate = this.tables.some((table) =>
-      table.id !== this.editingId && table.number.trim().toLowerCase() === number.toLowerCase()
+    const number = String(this.tableForm.value.number).trim();
+    const isDuplicate = this.tables.some(
+      (table) =>
+        table.id !== this.editingId && table.number.trim().toLowerCase() === number.toLowerCase(),
     );
 
     if (isDuplicate) {
@@ -82,23 +100,31 @@ export class TablesComponent implements OnInit {
       return;
     }
 
-    const payload: CreateTableRequest = { ...this.tableForm.value, number };
+    const payload: CreateTableRequest = {
+      number,
+      capacity: Number(this.tableForm.value.capacity),
+      isOccupied: Boolean(this.tableForm.value.isOccupied),
+    };
+    const request = this.editingId
+      ? this.tableService.updateTable(this.editingId, payload)
+      : this.tableService.createTable(payload);
 
-    if (this.editingId) {
-      this.tableService.updateTable(this.editingId, payload).subscribe(() => this.resetFormAndReload());
-      return;
-    }
-
-    this.tableService.createTable(payload).subscribe(() => this.resetFormAndReload());
+    request.subscribe({
+      next: () => this.resetFormAndReload(),
+      error: () =>
+        this.showError(
+          this.editingId ? 'No se pudo actualizar la mesa.' : 'No se pudo crear la mesa.',
+        ),
+    });
   }
 
   editTable(table: Table): void {
     this.editingId = table.id;
+    this.errorMessage = '';
     this.tableForm.patchValue({
       number: table.number,
       capacity: table.capacity,
-      status: table.status,
-      isOccupied: table.isOccupied
+      isOccupied: table.isOccupied,
     });
   }
 
@@ -106,22 +132,30 @@ export class TablesComponent implements OnInit {
     if (!confirm('¿Desea eliminar esta mesa?')) {
       return;
     }
-    this.tableService.deleteTable(id).subscribe(() => this.loadTables());
+
+    this.tableService.deleteTable(id).subscribe({
+      next: () => this.loadTables(),
+      error: () => this.showError('No se pudo eliminar la mesa.'),
+    });
   }
 
   resetForm(): void {
     this.editingId = null;
+    this.errorMessage = '';
     this.tableForm.reset({
       number: '',
       capacity: null,
-      status: 'Disponible',
-      isOccupied: false
+      isOccupied: false,
     });
   }
 
   private resetFormAndReload(): void {
     this.resetForm();
-    this.cdr.markForCheck();
     this.loadTables();
+  }
+
+  private showError(message: string): void {
+    this.errorMessage = message;
+    this.cdr.markForCheck();
   }
 }
