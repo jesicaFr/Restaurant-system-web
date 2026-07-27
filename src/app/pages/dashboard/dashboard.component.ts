@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef,Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,7 +30,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private readonly tableService: TableService,
     private readonly orderService: OrderService,
-    private readonly cashRegisterService: CashRegisterService
+    private readonly cashRegisterService: CashRegisterService,
+     private readonly cdr: ChangeDetectorRef
   ) {}
 
   errorMessage = '';
@@ -54,11 +55,14 @@ export class DashboardComponent implements OnInit {
       }))
     }).subscribe({
       next: ({ tables, orders, sales }) => {
+        console.log({ tables, orders, sales });
         this.totalTables = tables.length;
         this.occupiedTables = tables.filter((table) => table.isOccupied).length;
         this.availableTables = tables.filter((table) => !table.isOccupied).length;
         this.activeOrders = orders.filter((order) => order.status !== 'Entregado').length;
         this.dailySales = sales;
+        this.dailySales = sales;
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.errorMessage = 'Error cargando el dashboard';
