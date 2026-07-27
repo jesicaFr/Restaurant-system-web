@@ -26,6 +26,10 @@ export class OrderService {
     return this.http.put<Order>(`${this.apiUrl}/${id}`, order);
   }
 
+  updateStatus(id: number, status: string): Observable<Order> {
+    return this.http.patch<Order>(`${this.apiUrl}/${id}/status`, { status });
+  }
+
   deleteOrder(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

@@ -87,7 +87,12 @@
         </ul>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-button color="primary" (click)="updateStatus(order)">Cambiar estado</button>
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select [ngModel]="order.status" [ngModelOptions]="{standalone: true}" (ngModelChange)="updateStatus(order, $event)">
+            <mat-option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</mat-option>
+          </mat-select>
+        </mat-form-field>
         <button mat-button color="warn" (click)="deleteOrder(order.id)">Eliminar</button>
       </mat-card-actions>
     </mat-card>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -28,6 +28,7 @@ export class OrdersComponent implements OnInit {
   menuItems: MenuItem[] = [];
   draftItems: Array<{ menuItemId: number; name: string; quantity: number; unitPrice: number }> = [];
   displayedColumns = ['name', 'quantity', 'price', 'total', 'actions'];
+  readonly orderStatuses = ['Pendiente', 'En preparación', 'Entregado'];
   selectedMenuItemId: number | null = null;
   selectedQuantity = 1;
   orderForm: FormGroup;
@@ -36,7 +37,8 @@ export class OrdersComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly orderService: OrderService,
     private readonly tableService: TableService,
-    private readonly menuItemService: MenuItemService
+    private readonly menuItemService: MenuItemService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.orderForm = this.fb.group({
       tableId: [null, Validators.required],
@@ -46,8 +48,14 @@ export class OrdersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
-    this.tableService.getTables().subscribe((tables) => (this.tables = tables));
-    this.menuItemService.getMenuItems().subscribe((items) => (this.menuItems = items));
+    this.tableService.getTables().subscribe((tables) => {
+      this.tables = tables;
+      this.cdr.markForCheck();
+    });
+    this.menuItemService.getMenuItems().subscribe((items) => {
+      this.menuItems = items;
+      this.cdr.markForCheck();
+    });
   }
 
   createOrder(): void {
@@ -57,12 +65,14 @@ export class OrdersComponent implements OnInit {
 
     const payload: CreateOrderRequest = {
       tableId: this.orderForm.value.tableId,
+      status: this.orderForm.value.status,
       items: this.draftItems.map((item) => ({ menuItemId: item.menuItemId, quantity: item.quantity }))
     };
 
     this.orderService.createOrder(payload).subscribe(() => {
       this.draftItems = [];
       this.orderForm.reset({ tableId: null, status: 'Pendiente' });
+      this.cdr.markForCheck();
       this.loadOrders();
     });
   }
@@ -77,25 +87,25 @@ export class OrdersComponent implements OnInit {
       return;
     }
 
-    this.draftItems.push({
+    this.draftItems = [...this.draftItems, {
       menuItemId: item.id,
       name: item.name,
       quantity: this.selectedQuantity,
       unitPrice: item.price
-    });
+    }];
+    this.selectedMenuItemId = null;
     this.selectedQuantity = 1;
   }
 
   removeItem(index: number): void {
-    this.draftItems.splice(index, 1);
+    this.draftItems = this.draftItems.filter((_, itemIndex) => itemIndex !== index);
   }
 
-  updateStatus(order: Order): void {
-    const nextStatus = prompt('Nuevo estado:', order.status);
-    if (!nextStatus) {
+  updateStatus(order: Order, status: string): void {
+    if (status === order.status) {
       return;
     }
-    this.orderService.updateOrder(order.id, { status: nextStatus }).subscribe(() => this.loadOrders());
+    this.orderService.updateStatus(order.id, status).subscribe(() => this.loadOrders());
   }
 
   deleteOrder(id: number): void {
@@ -108,6 +118,7 @@ export class OrdersComponent implements OnInit {
   private loadOrders(): void {
     this.orderService.getOrders().subscribe((orders) => {
       this.orders = orders;
+      this.cdr.markForCheck();
     });
   }
 }

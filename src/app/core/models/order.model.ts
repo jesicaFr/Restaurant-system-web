@@ -23,5 +23,6 @@ export interface CreateOrderItemRequest {
 
 export interface CreateOrderRequest {
   tableId: number;
+  status: string;
   items: CreateOrderItemRequest[];
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -26,7 +26,8 @@ export class MenuItemsComponent implements OnInit {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly menuItemService: MenuItemService
+    private readonly menuItemService: MenuItemService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.itemForm = this.fb.group({
       name: ['', Validators.required],
@@ -43,6 +44,7 @@ export class MenuItemsComponent implements OnInit {
   loadItems(): void {
     this.menuItemService.getMenuItems().subscribe((items) => {
       this.items = items;
+      this.cdr.markForCheck();
     });
   }
 
@@ -90,6 +92,7 @@ export class MenuItemsComponent implements OnInit {
 
   private resetFormAndReload(): void {
     this.resetForm();
+    this.cdr.markForCheck();
     this.loadItems();
   }
 }
