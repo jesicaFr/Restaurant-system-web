@@ -2,11 +2,11 @@
   <h2>Caja</h2>
   <form [formGroup]="dateForm" (ngSubmit)="loadSales()" class="form-card">
     <mat-card>
-      <mat-card-title>Consultar ventas del día</mat-card-title>
+      <mat-card-title>Consultar caja</mat-card-title>
       <mat-card-content>
         <mat-form-field>
           <mat-label>Fecha</mat-label>
-          <input matInput type="date" formControlName="date" />
+          <input matInput type="date" [min]="minDate" [max]="maxDate" formControlName="date" />
         </mat-form-field>
       </mat-card-content>
       <mat-card-actions>
@@ -15,12 +15,16 @@
     </mat-card>
   </form>
 
-  <mat-card *ngIf="sales" class="result-card">
-    <mat-card-title>Resumen</mat-card-title>
+  <mat-card *ngIf="sales" class="result-card receipt">
+    <mat-card-title>RESUMEN DE CAJA</mat-card-title>
     <mat-card-content>
-      <p><strong>Fecha:</strong> {{ sales.date }}</p>
-      <p><strong>Total vendido:</strong> {{ sales.totalSales | currency }}</p>
-      <p><strong>Ventas del día:</strong> {{ sales.ordersCount }}</p>
+      <p class="receipt-date">Fecha: {{ sales.date | date:'longDate' }}</p>
+      <div class="receipt-line"><span>Ventas totales</span><strong>{{ sales.totalSales | currency }}</strong></div>
+      <div class="receipt-line"><span>Pedidos cobrados</span><strong>{{ sales.paidOrdersCount }}</strong></div>
+      <div class="receipt-line"><span>Efectivo</span><strong>{{ sales.cashSales | currency }}</strong></div>
+      <div class="receipt-line"><span>Tarjeta</span><strong>{{ sales.cardSales | currency }}</strong></div>
+      <div class="receipt-line total"><span>Ticket promedio</span><strong>{{ sales.averageTicket | currency }}</strong></div>
+      <p class="receipt-footer">Gracias por elegirnos</p>
     </mat-card-content>
   </mat-card>
 </div>

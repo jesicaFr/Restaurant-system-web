@@ -1,3 +1,9 @@
 .page { display: flex; flex-direction: column; gap: 1.5rem; }
 .form-card { max-width: 400px; }
 .result-card { max-width: 400px; }
+.receipt { background: #fffdf8; border: 1px dashed #6c625a; border-radius: 2px; box-shadow: 4px 5px 0 rgba(60, 48, 43, 0.15); font-family: 'Courier New', monospace; }
+.receipt mat-card-title { letter-spacing: 0.12em; text-align: center; font-family: 'Courier New', monospace; font-size: 1rem; }
+.receipt-date { text-align: center; border-bottom: 1px dashed #6c625a; padding-bottom: 0.75rem; }
+.receipt-line { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; }
+.receipt-line.total { border-top: 1px dashed #6c625a; margin-top: 0.5rem; padding-top: 0.9rem; font-size: 1.05rem; }
+.receipt-footer { text-align: center; margin: 1.25rem 0 0; font-size: 0.82rem; }

@@ -1,5 +1,8 @@
 export interface DailySalesDto {
   date: string;
   totalSales: number;
-  ordersCount: number;
+  paidOrdersCount: number;
+  cashSales: number;
+  cardSales: number;
+  averageTicket: number;
 }

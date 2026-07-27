@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -18,13 +18,16 @@ import { DailySalesDto } from '../../core/models/cash-register.model';
 export class CashRegisterComponent implements OnInit {
   sales: DailySalesDto | null = null;
   dateForm: FormGroup;
+  readonly maxDate = this.toDateInputValue(new Date());
+  readonly minDate = this.toDateInputValue(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly cashRegisterService: CashRegisterService
+    private readonly cashRegisterService: CashRegisterService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.dateForm = this.fb.group({
-      date: [new Date().toISOString().slice(0, 10), Validators.required]
+      date: [this.maxDate, Validators.required]
     });
   }
 
@@ -36,6 +39,14 @@ export class CashRegisterComponent implements OnInit {
     const date = this.dateForm.value.date;
     this.cashRegisterService.getDailySales(date).subscribe((sales) => {
       this.sales = sales;
+      this.cdr.markForCheck();
     });
+  }
+
+  private toDateInputValue(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }

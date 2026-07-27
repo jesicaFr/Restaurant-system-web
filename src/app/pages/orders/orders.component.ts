@@ -42,7 +42,8 @@ export class OrdersComponent implements OnInit {
   ) {
     this.orderForm = this.fb.group({
       tableId: [null, Validators.required],
-      status: ['Pendiente', Validators.required]
+      status: ['Pendiente', Validators.required],
+      paymentMethod: ['Efectivo', Validators.required]
     });
   }
 
@@ -63,12 +64,13 @@ export class OrdersComponent implements OnInit {
     const payload: CreateOrderRequest = {
       tableId: this.orderForm.value.tableId,
       status: this.orderForm.value.status,
+      paymentMethod: this.orderForm.value.paymentMethod,
       items: this.draftItems.map((item) => ({ menuItemId: item.menuItemId, quantity: item.quantity }))
     };
 
     this.orderService.createOrder(payload).subscribe(() => {
       this.draftItems = [];
-      this.orderForm.reset({ tableId: null, status: 'Pendiente' });
+      this.orderForm.reset({ tableId: null, status: 'Pendiente', paymentMethod: 'Efectivo' });
       this.cdr.markForCheck();
       this.loadOrders();
       this.loadTables();

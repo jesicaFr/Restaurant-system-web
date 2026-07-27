@@ -12,6 +12,7 @@ export interface Order {
   tableId: number;
   orderDate: string;
   status: string;
+  paymentMethod: string;
   totalAmount: number;
   orderDetails: OrderDetail[];
 }
@@ -24,5 +25,6 @@ export interface CreateOrderItemRequest {
 export interface CreateOrderRequest {
   tableId: number;
   status: string;
+  paymentMethod: string;
   items: CreateOrderItemRequest[];
 }

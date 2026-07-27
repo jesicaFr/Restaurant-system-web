@@ -23,6 +23,13 @@
               <mat-option value="Entregado">Entregado</mat-option>
             </mat-select>
           </mat-form-field>
+          <mat-form-field>
+            <mat-label>Medio de pago</mat-label>
+            <mat-select formControlName="paymentMethod">
+              <mat-option value="Efectivo">Efectivo</mat-option>
+              <mat-option value="Tarjeta">Tarjeta</mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
 
         <div class="items-section">
@@ -98,6 +105,7 @@
         <p><strong>Mesa:</strong> {{ order.tableId }}</p>
         <p><strong>Fecha:</strong> {{ order.orderDate | date:'short' }}</p>
         <p><strong>Estado:</strong> {{ order.status }}</p>
+        <p><strong>Pago:</strong> {{ order.paymentMethod }}</p>
         <p><strong>Total:</strong> {{ order.totalAmount | currency }}</p>
         <ul>
           <li *ngFor="let detail of order.orderDetails">{{ detail.menuItemName }} x{{ detail.quantity }} - {{ detail.totalPrice | currency }}</li>

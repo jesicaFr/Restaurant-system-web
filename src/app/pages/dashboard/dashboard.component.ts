@@ -8,10 +8,8 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TableService } from '../../core/services/table.service';
 import { OrderService } from '../../core/services/order.service';
-import { CashRegisterService } from '../../core/services/cash-register.service';
 import { Table } from '../../core/models/table.model';
 import { Order } from '../../core/models/order.model';
-import { DailySalesDto } from '../../core/models/cash-register.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,12 +23,10 @@ export class DashboardComponent implements OnInit {
   occupiedTables = 0;
   availableTables = 0;
   activeOrders = 0;
-  dailySales: DailySalesDto = { date: '', totalSales: 0, ordersCount: 0 };
 
   constructor(
     private readonly tableService: TableService,
     private readonly orderService: OrderService,
-    private readonly cashRegisterService: CashRegisterService,
      private readonly cdr: ChangeDetectorRef
   ) {}
 
@@ -47,21 +43,14 @@ export class DashboardComponent implements OnInit {
         console.error('Error cargando estadísticas de pedidos', error);
         this.errorMessage = 'No se pudieron cargar los datos de pedidos';
         return of([] as Order[]);
-      })),
-      sales: this.cashRegisterService.getDailySales(new Date().toISOString().slice(0, 10)).pipe(catchError((error) => {
-        console.error('Error cargando ventas diarias', error);
-        this.errorMessage = 'No se pudieron cargar los datos de ventas';
-        return of({ date: '', totalSales: 0, ordersCount: 0 } as DailySalesDto);
       }))
     }).subscribe({
-      next: ({ tables, orders, sales }) => {
-        console.log({ tables, orders, sales });
+      next: ({ tables, orders }) => {
+        console.log({ tables, orders });
         this.totalTables = tables.length;
         this.occupiedTables = tables.filter((table) => table.isOccupied).length;
         this.availableTables = tables.filter((table) => !table.isOccupied).length;
         this.activeOrders = orders.filter((order) => order.status !== 'Entregado').length;
-        this.dailySales = sales;
-        this.dailySales = sales;
         this.cdr.markForCheck();
       },
       error: (error) => {
@@ -82,16 +71,4 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  private loadSales(): void {
-    const today = new Date().toISOString().slice(0, 10);
-    this.cashRegisterService.getDailySales(today).subscribe({
-      next: (sales) => {
-        console.log('Dashboard dailySales', sales);
-        this.dailySales = sales;
-      },
-      error: (error) => {
-        console.error('Error cargando ventas diarias', error);
-      }
-    });
-  }
 }
