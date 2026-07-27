@@ -8,3 +8,6 @@
 .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
 .table-card { min-height: 200px; }
 .empty-state { padding: 1rem; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; color: #5b5b5b; }
+.capacity-input { -moz-appearance: textfield; }
+.capacity-input::-webkit-outer-spin-button,
+.capacity-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }

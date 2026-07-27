@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -27,11 +27,12 @@ export class TablesComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly tableService: TableService,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.tableForm = this.fb.group({
       number: ['', Validators.required],
-      capacity: [null, [Validators.required, Validators.min(1)]],
+      capacity: [null, [Validators.required, Validators.min(2), Validators.pattern(/^[0-9]+$/)]],
       status: ['Disponible', Validators.required],
       isOccupied: [false, Validators.required]
     });
@@ -44,6 +45,7 @@ export class TablesComponent implements OnInit {
   loadTables(): void {
     this.tableService.getTables().subscribe((tables) => {
       this.tables = tables;
+      this.cdr.markForCheck();
     });
   }
 
@@ -70,7 +72,17 @@ export class TablesComponent implements OnInit {
       return;
     }
 
-    const payload: CreateTableRequest = this.tableForm.value;
+    const number = this.tableForm.value.number.trim();
+    const isDuplicate = this.tables.some((table) =>
+      table.id !== this.editingId && table.number.trim().toLowerCase() === number.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      this.tableForm.get('number')?.setErrors({ duplicate: true });
+      return;
+    }
+
+    const payload: CreateTableRequest = { ...this.tableForm.value, number };
 
     if (this.editingId) {
       this.tableService.updateTable(this.editingId, payload).subscribe(() => this.resetFormAndReload());
@@ -109,6 +121,7 @@ export class TablesComponent implements OnInit {
 
   private resetFormAndReload(): void {
     this.resetForm();
+    this.cdr.markForCheck();
     this.loadTables();
   }
 }

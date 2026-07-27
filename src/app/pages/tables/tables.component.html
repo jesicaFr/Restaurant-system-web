@@ -27,25 +27,14 @@
           <mat-form-field>
             <mat-label>Número</mat-label>
             <input matInput formControlName="number" />
+            <mat-error *ngIf="tableForm.get('number')?.hasError('required')">El número es obligatorio.</mat-error>
+            <mat-error *ngIf="tableForm.get('number')?.hasError('duplicate')">Ya existe una mesa con ese número.</mat-error>
           </mat-form-field>
           <mat-form-field>
             <mat-label>Capacidad</mat-label>
-            <input matInput type="number" formControlName="capacity" />
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="status">
-              <mat-option value="Disponible">Disponible</mat-option>
-              <mat-option value="Reservada">Reservada</mat-option>
-              <mat-option value="Ocupada">Ocupada</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>Disponibilidad</mat-label>
-            <mat-select formControlName="isOccupied">
-              <mat-option [value]="true">Ocupada</mat-option>
-              <mat-option [value]="false">Disponible</mat-option>
-            </mat-select>
+            <input matInput class="capacity-input" type="number" min="2" step="1" formControlName="capacity" />
+            <mat-error *ngIf="tableForm.get('capacity')?.hasError('min')">La capacidad debe ser 2 o más.</mat-error>
+            <mat-error *ngIf="tableForm.get('capacity')?.hasError('pattern')">Ingresá un número entero.</mat-error>
           </mat-form-field>
         </div>
       </mat-card-content>

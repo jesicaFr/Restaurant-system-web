@@ -1,6 +1,6 @@
 <div class="page">
   <div class="page-header">
-    <h2>Pedidos</h2>
+    <h2>Orden de pedidos</h2>
   </div>
 
   <form [formGroup]="orderForm" (ngSubmit)="createOrder()" class="form-card">
@@ -11,8 +11,9 @@
           <mat-form-field>
             <mat-label>Mesa</mat-label>
             <mat-select formControlName="tableId">
-              <mat-option *ngFor="let table of tables" [value]="table.id">{{ table.number }} - {{ table.capacity }} personas</mat-option>
+              <mat-option *ngFor="let table of availableTables" [value]="table.id">{{ table.number }} - {{ table.capacity }} personas</mat-option>
             </mat-select>
+            <mat-hint *ngIf="availableTables.length === 0">No hay mesas disponibles.</mat-hint>
           </mat-form-field>
           <mat-form-field>
             <mat-label>Estado</mat-label>
@@ -73,6 +74,22 @@
       </mat-card-actions>
     </mat-card>
   </form>
+
+  <section class="table-availability">
+    <h3>Disponibilidad de mesas</h3>
+    <div class="tables-status-grid">
+      <mat-card *ngFor="let table of tables">
+        <mat-card-title>Mesa {{ table.number }}</mat-card-title>
+        <mat-card-content>
+          <p>{{ table.isOccupied ? 'Ocupada' : 'Disponible' }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" *ngIf="table.isOccupied" (click)="releaseTable(table)">Liberar mesa</button>
+          <span *ngIf="!table.isOccupied">Lista para asignar</span>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </section>
 
   <div class="orders-list">
     <mat-card *ngFor="let order of orders" class="order-card">

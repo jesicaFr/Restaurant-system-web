@@ -28,7 +28,7 @@ export class OrdersComponent implements OnInit {
   menuItems: MenuItem[] = [];
   draftItems: Array<{ menuItemId: number; name: string; quantity: number; unitPrice: number }> = [];
   displayedColumns = ['name', 'quantity', 'price', 'total', 'actions'];
-  readonly orderStatuses = ['Pendiente', 'En preparación', 'Entregado'];
+  readonly orderStatuses = ['Pendiente', 'En preparación', 'Entregado', 'Disponible'];
   selectedMenuItemId: number | null = null;
   selectedQuantity = 1;
   orderForm: FormGroup;
@@ -48,10 +48,7 @@ export class OrdersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
-    this.tableService.getTables().subscribe((tables) => {
-      this.tables = tables;
-      this.cdr.markForCheck();
-    });
+    this.loadTables();
     this.menuItemService.getMenuItems().subscribe((items) => {
       this.menuItems = items;
       this.cdr.markForCheck();
@@ -74,6 +71,7 @@ export class OrdersComponent implements OnInit {
       this.orderForm.reset({ tableId: null, status: 'Pendiente' });
       this.cdr.markForCheck();
       this.loadOrders();
+      this.loadTables();
     });
   }
 
@@ -105,7 +103,31 @@ export class OrdersComponent implements OnInit {
     if (status === order.status) {
       return;
     }
-    this.orderService.updateStatus(order.id, status).subscribe(() => this.loadOrders());
+    this.orderService.updateStatus(order.id, status).subscribe(() => {
+      this.loadOrders();
+      this.loadTables();
+    });
+  }
+
+  releaseTable(table: Table): void {
+    const activeOrder = this.orders.find((order) =>
+      order.tableId === table.id && order.status !== 'Disponible'
+    );
+
+    if (activeOrder) {
+      this.orderService.updateStatus(activeOrder.id, 'Disponible').subscribe(() => {
+        this.loadOrders();
+        this.loadTables();
+      });
+      return;
+    }
+
+    this.tableService.updateTable(table.id, {
+      number: table.number,
+      capacity: table.capacity,
+      status: 'Disponible',
+      isOccupied: false
+    }).subscribe(() => this.loadTables());
   }
 
   deleteOrder(id: number): void {
@@ -118,6 +140,17 @@ export class OrdersComponent implements OnInit {
   private loadOrders(): void {
     this.orderService.getOrders().subscribe((orders) => {
       this.orders = orders;
+      this.cdr.markForCheck();
+    });
+  }
+
+  get availableTables(): Table[] {
+    return this.tables.filter((table) => !table.isOccupied);
+  }
+
+  private loadTables(): void {
+    this.tableService.getTables().subscribe((tables) => {
+      this.tables = tables;
       this.cdr.markForCheck();
     });
   }
