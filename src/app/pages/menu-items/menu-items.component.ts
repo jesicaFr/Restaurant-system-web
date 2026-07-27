@@ -20,7 +20,7 @@ import { CreateMenuItemRequest, MenuItem } from '../../core/models/menu-item.mod
 })
 export class MenuItemsComponent implements OnInit {
   items: MenuItem[] = [];
-  displayedColumns = ['name', 'description', 'price', 'isAvailable', 'actions'];
+  displayedColumns = ['name', 'description', 'price', 'quantity', 'isAvailable', 'actions'];
   itemForm: FormGroup;
   editingId: number | null = null;
 
@@ -33,7 +33,16 @@ export class MenuItemsComponent implements OnInit {
       name: ['', Validators.required],
       description: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
+      quantity: [0, [Validators.required, Validators.min(0), Validators.pattern(/^[0-9]+$/)]],
       isAvailable: [true, Validators.required]
+    });
+
+    this.itemForm.get('quantity')?.valueChanges.subscribe((quantity) => {
+      if (quantity === null || quantity === undefined || quantity === '') {
+        return;
+      }
+
+      this.itemForm.get('isAvailable')?.setValue(Number(quantity) > 0, { emitEvent: false });
     });
   }
 
@@ -69,6 +78,7 @@ export class MenuItemsComponent implements OnInit {
       name: item.name,
       description: item.description,
       price: item.price,
+      quantity: item.quantity,
       isAvailable: item.isAvailable
     });
   }
@@ -86,6 +96,7 @@ export class MenuItemsComponent implements OnInit {
       name: '',
       description: '',
       price: 0,
+      quantity: 0,
       isAvailable: true
     });
   }

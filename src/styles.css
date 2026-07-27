@@ -186,3 +186,21 @@ body {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700"><g fill="none" stroke="%23624b3f" stroke-width="2" opacity="0.12"><rect x="30" y="30" width="840" height="640" rx="12"/><path d="M170 250h240v140H170zM430 130h240v110H430zM690 260h140v160H690zM210 450h140v100H210zM520 460h160v90H520z"/></g></svg>');
   background-repeat: no-repeat; background-size: contain; pointer-events: none; opacity: 0.16;
 }
+.product-select-panel.mat-mdc-select-panel {
+  min-width: min(440px, calc(100vw - 32px)) !important;
+  padding: 0.45rem !important;
+  border: 1px solid rgba(60, 48, 43, 0.12);
+  border-radius: 12px !important;
+  box-shadow: 0 12px 30px rgba(60, 48, 43, 0.18) !important;
+}
+
+.product-select-panel .mat-mdc-option {
+  min-height: 52px;
+  margin: 0.15rem 0;
+  border-radius: 8px;
+}
+
+.product-select-panel .mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.product-select-panel .mat-mdc-option.mdc-list-item--selected {
+  background: #f3e8dc !important;
+}

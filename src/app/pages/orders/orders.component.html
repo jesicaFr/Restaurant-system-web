@@ -39,8 +39,29 @@
           <div class="item-row">
             <mat-form-field>
               <mat-label>Producto</mat-label>
-              <mat-select [(ngModel)]="selectedMenuItemId" [ngModelOptions]="{standalone: true}">
-                <mat-option *ngFor="let item of menuItems" [value]="item.id">{{ item.name }} - {{ item.price | currency }}</mat-option>
+              <mat-select
+                [(ngModel)]="selectedMenuItemId"
+                [ngModelOptions]="{standalone: true}"
+                panelClass="product-select-panel">
+                <mat-select-trigger>
+                  <ng-container *ngFor="let selected of menuItems">
+                    <span *ngIf="selected.id === selectedMenuItemId" class="selected-product">
+                      <strong>{{ selected.name }}</strong>
+                      <span>{{ selected.price | currency }}</span>
+                      <span class="selected-product__stock">Stock: {{ selected.quantity }}</span>
+                    </span>
+                  </ng-container>
+                </mat-select-trigger>
+                <mat-option
+                  *ngFor="let item of menuItems"
+                  [value]="item.id"
+                  [disabled]="!item.isAvailable || item.quantity === 0">
+                  <span class="product-option">
+                    <span class="product-option__name">{{ item.name }}</span>
+                    <span class="product-option__price">{{ item.price | currency }}</span>
+                    <span class="product-option__stock">Stock: {{ item.quantity }}</span>
+                  </span>
+                </mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field>

@@ -4,7 +4,17 @@
 .form-card { max-width: 1000px; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
 .items-section { margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem; }
-.item-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.item-row { display: grid; grid-template-columns: minmax(260px, 2fr) minmax(130px, 1fr) auto; gap: 1rem; align-items: start; }
+.item-row mat-form-field { width: 100%; }
+.item-row > button { min-height: 56px; padding-inline: 1.35rem; }
+.product-option { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 0.9rem; width: 100%; }
+.product-option__name { overflow: hidden; color: #3c302b; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.product-option__price { color: #6d574a; font-size: 0.88rem; white-space: nowrap; }
+.product-option__stock { border-radius: 999px; background: #eee2d4; color: #704c31; padding: 0.18rem 0.55rem; font-size: 0.76rem; font-weight: 700; white-space: nowrap; }
+.selected-product { display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
+.selected-product strong { overflow: hidden; color: #3c302b; text-overflow: ellipsis; white-space: nowrap; }
+.selected-product > span:not(.selected-product__stock) { color: #6d574a; font-size: 0.88rem; white-space: nowrap; }
+.selected-product__stock { border-radius: 999px; background: #eee2d4; color: #704c31; padding: 0.15rem 0.5rem; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
 .orders-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 290px)); gap: 1rem; align-items: start; }
 .order-card { border: 1px solid rgba(60, 48, 43, 0.14); border-left: 4px solid #8b5e3c; border-radius: 13px; overflow: hidden; background: linear-gradient(135deg, #fffdf9, #f5ece0); }
 .order-card mat-card-title { padding: 0.8rem 1rem 0; color: #3c302b; font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; }
@@ -39,3 +49,8 @@
 .table-status-card.is-occupied .availability-label { background: #f2c9c3; color: #a53b34; }
 .table-status-card.is-occupied button { background: #a9433b; color: #fff; }
 .full-width { width: 100%; }
+
+@media (max-width: 700px) {
+  .item-row { grid-template-columns: 1fr; }
+  .item-row > button { width: 100%; }
+}

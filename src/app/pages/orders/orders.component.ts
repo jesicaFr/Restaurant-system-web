@@ -51,10 +51,7 @@ export class OrdersComponent implements OnInit {
   ngOnInit(): void {
     this.loadOrders();
     this.loadTables();
-    this.menuItemService.getMenuItems().subscribe((items) => {
-      this.menuItems = items;
-      this.cdr.markForCheck();
-    });
+    this.loadMenuItems();
   }
 
   createOrder(): void {
@@ -84,6 +81,7 @@ export class OrdersComponent implements OnInit {
         this.cdr.detectChanges();
         this.loadOrders();
         this.loadTables();
+        this.loadMenuItems();
       },
       error: () => {
         this.errorMessage = 'No se pudo guardar el pedido. Verificá que la mesa siga disponible.';
@@ -98,7 +96,13 @@ export class OrdersComponent implements OnInit {
     }
 
     const item = this.menuItems.find((menuItem) => menuItem.id === this.selectedMenuItemId);
-    if (!item) {
+    const quantityAlreadyAdded = this.draftItems
+      .filter((draftItem) => draftItem.menuItemId === this.selectedMenuItemId)
+      .reduce((total, draftItem) => total + draftItem.quantity, 0);
+
+    if (!item || !item.isAvailable || item.quantity < quantityAlreadyAdded + this.selectedQuantity) {
+      this.errorMessage = 'No hay stock suficiente para agregar ese producto.';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -156,6 +160,13 @@ export class OrdersComponent implements OnInit {
   private loadTables(): void {
     this.tableService.getTables().subscribe((tables) => {
       this.tables = tables;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private loadMenuItems(): void {
+    this.menuItemService.getMenuItems().subscribe((items) => {
+      this.menuItems = items;
       this.cdr.markForCheck();
     });
   }
