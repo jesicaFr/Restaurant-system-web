@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +21,7 @@ import { CashRegisterService } from '../../core/services/cash-register.service';
   ],
   templateUrl: './cash-register.component.html',
   styleUrls: ['./cash-register.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CashRegisterComponent implements OnInit {
   sales: DailySalesDto | null = null;

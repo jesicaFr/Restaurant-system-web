@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -20,6 +20,7 @@ import { Table } from '../../core/models/table.model';
 import { MenuItemService } from '../../core/services/menu-item.service';
 import { OrderService } from '../../core/services/order.service';
 import { TableService } from '../../core/services/table.service';
+import { ConfirmationService } from '../../shared/services/confirmation.service';
 
 interface DraftOrderItem {
   menuItemId: number;
@@ -45,6 +46,7 @@ interface DraftOrderItem {
   ],
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdersComponent implements OnInit {
   readonly displayedColumns = ['name', 'quantity', 'price', 'total', 'actions'];
@@ -64,6 +66,7 @@ export class OrdersComponent implements OnInit {
     private readonly orderService: OrderService,
     private readonly tableService: TableService,
     private readonly menuItemService: MenuItemService,
+    private readonly confirmation: ConfirmationService,
     private readonly cdr: ChangeDetectorRef,
   ) {
     this.orderForm = this.fb.group({
@@ -195,13 +198,18 @@ export class OrdersComponent implements OnInit {
   }
 
   deleteOrder(id: number): void {
-    if (!confirm('¿Desea eliminar este pedido?')) {
-      return;
-    }
+    this.confirmation.confirm({
+      title: 'Eliminar pedido',
+      message: '¿Desea eliminar este pedido?',
+    }).subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
 
-    this.orderService.deleteOrder(id).subscribe({
-      next: () => this.loadOrders(),
-      error: () => this.showError('No se pudo eliminar el pedido.'),
+      this.orderService.deleteOrder(id).subscribe({
+        next: () => this.loadOrders(),
+        error: () => this.showError('No se pudo eliminar el pedido.'),
+      });
     });
   }
 

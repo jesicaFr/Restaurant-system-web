@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { CreateMenuItemRequest, MenuItem } from '../../core/models/menu-item.model';
 import { MenuItemService } from '../../core/services/menu-item.service';
+import { ConfirmationService } from '../../shared/services/confirmation.service';
 
 @Component({
   selector: 'app-menu-items',
@@ -28,6 +36,7 @@ import { MenuItemService } from '../../core/services/menu-item.service';
   ],
   templateUrl: './menu-items.component.html',
   styleUrls: ['./menu-items.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuItemsComponent implements OnInit {
   readonly displayedColumns = [
@@ -48,6 +57,7 @@ export class MenuItemsComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly menuItemService: MenuItemService,
+    private readonly confirmation: ConfirmationService,
     private readonly cdr: ChangeDetectorRef,
   ) {
     this.itemForm = this.fb.group({
@@ -129,13 +139,18 @@ export class MenuItemsComponent implements OnInit {
   }
 
   deleteItem(id: number): void {
-    if (!confirm('¿Desea eliminar este producto?')) {
-      return;
-    }
+    this.confirmation.confirm({
+      title: 'Eliminar producto',
+      message: '¿Desea eliminar este producto?',
+    }).subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
 
-    this.menuItemService.deleteMenuItem(id).subscribe({
-      next: () => this.loadItems(),
-      error: () => this.showError('No se pudo eliminar el producto.'),
+      this.menuItemService.deleteMenuItem(id).subscribe({
+        next: () => this.loadItems(),
+        error: () => this.showError('No se pudo eliminar el producto.'),
+      });
     });
   }
 

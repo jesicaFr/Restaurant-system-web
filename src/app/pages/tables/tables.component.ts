@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CreateTableRequest, Table } from '../../core/models/table.model';
 import { TableService } from '../../core/services/table.service';
+import { ConfirmationService } from '../../shared/services/confirmation.service';
 
 @Component({
   selector: 'app-tables',
@@ -25,6 +26,7 @@ import { TableService } from '../../core/services/table.service';
   ],
   templateUrl: './tables.component.html',
   styleUrls: ['./tables.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TablesComponent implements OnInit {
   tables: Table[] = [];
@@ -36,6 +38,7 @@ export class TablesComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly tableService: TableService,
+    private readonly confirmation: ConfirmationService,
     private readonly cdr: ChangeDetectorRef,
   ) {
     this.tableForm = this.fb.group({
@@ -90,16 +93,6 @@ export class TablesComponent implements OnInit {
     }
 
     const number = String(this.tableForm.value.number).trim();
-    const isDuplicate = this.tables.some(
-      (table) =>
-        table.id !== this.editingId && table.number.trim().toLowerCase() === number.toLowerCase(),
-    );
-
-    if (isDuplicate) {
-      this.tableForm.get('number')?.setErrors({ duplicate: true });
-      return;
-    }
-
     const payload: CreateTableRequest = {
       number,
       capacity: Number(this.tableForm.value.capacity),
@@ -129,13 +122,18 @@ export class TablesComponent implements OnInit {
   }
 
   deleteTable(id: number): void {
-    if (!confirm('¿Desea eliminar esta mesa?')) {
-      return;
-    }
+    this.confirmation.confirm({
+      title: 'Eliminar mesa',
+      message: '¿Desea eliminar esta mesa?',
+    }).subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
 
-    this.tableService.deleteTable(id).subscribe({
-      next: () => this.loadTables(),
-      error: () => this.showError('No se pudo eliminar la mesa.'),
+      this.tableService.deleteTable(id).subscribe({
+        next: () => this.loadTables(),
+        error: () => this.showError('No se pudo eliminar la mesa.'),
+      });
     });
   }
 

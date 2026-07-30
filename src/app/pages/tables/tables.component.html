@@ -22,9 +22,6 @@
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
-      <button mat-raised-button color="primary" type="button" (click)="resetForm()">
-        Nueva mesa
-      </button>
     </div>
   </div>
 
@@ -40,9 +37,6 @@
             <input matInput formControlName="number" />
             <mat-error *ngIf="tableForm.get('number')?.hasError('required')"
               >El número es obligatorio.</mat-error
-            >
-            <mat-error *ngIf="tableForm.get('number')?.hasError('duplicate')"
-              >Ya existe una mesa con ese número.</mat-error
             >
           </mat-form-field>
           <mat-form-field>
